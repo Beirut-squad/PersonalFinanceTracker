@@ -1,3 +1,0 @@
-interface Testing {
-    fun check()
-}
