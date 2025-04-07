@@ -1,0 +1,3 @@
+interface Testing {
+    fun check()
+}
