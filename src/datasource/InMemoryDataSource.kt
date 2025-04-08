@@ -1,4 +1,4 @@
-package data.datasource
+package datasource
 
 class InMemoryDataSource : FinanceTrackerDataSource {
 }
