@@ -100,6 +100,7 @@ class EditTransactionChecker(
             expectedResult = false
         )
 
+        //Invalid: Should Fail To Edit When Amount Is Negative
         val transactionWithNegativeAmount = Transaction(
             id = 9,
             title = "Freelance Salary",
@@ -114,6 +115,7 @@ class EditTransactionChecker(
             expectedResult = false
         )
 
+        // Invalid: Should Fail To Edit When Amount EquaIs Zero
         val transactionWithAmountEqualZero = Transaction(
             id = 10,
             title = "Snacks",
@@ -128,6 +130,7 @@ class EditTransactionChecker(
             expectedResult = false
         )
 
+        // Invalid: Should Fail To enter empty description
         val transactionWithEmptyDescription = Transaction(
             id = 7,
             title = "",
@@ -142,6 +145,9 @@ class EditTransactionChecker(
             expectedResult = false
         )
 
+
+
+        // Invalid: Should Fail To Edit When Amount Exceeds Valid Range
         val transactionWithAmountOutOFRange =Transaction(
             id = 9,
             title = "Freelance Salary",
