@@ -1,9 +1,10 @@
+import Testing.EditTransactionChecker
 import core.FinanceTrackerManagerImpl
 
 fun main() {
-    val checker = TrackingManagerChecker(
+    val checker = EditTransactionChecker(
         financeTrackerManager = FinanceTrackerManagerImpl()
     )
 
-    checker.runAllTests()
+    checker.editTransactionCheck()
 }
