@@ -8,111 +8,60 @@ class TrackingManagerChecker(
     private val financeTrackerManager: FinanceTrackerManager
 ) {
 
-    fun addValidTest() {
+    fun editWithValidData(){
         val transaction = Transaction(
             id = 0,
-            title = "College fees",
-            amount = 500.0,
-            transActionType = TransactionType.EXPENSE,
-            category = Category.FEES,
-            date = Date()
-        )
-
-        check(
-            name = "Valid test",
-            result = financeTrackerManager.addTransaction(transaction),
-            expectedResult = true
-        )
-    }
-
-    fun addRepeatedId() {
-        val transaction1 = Transaction(
-            id = 0,
-            title = "Shopping Market",
-            amount = 1000.0,
-            transActionType = TransactionType.EXPENSE,
-            category = Category.FOOD,
-            date = Date()
-        )
-
-        financeTrackerManager.addTransaction(transaction1)
-
-        val transaction2 = Transaction(
-            id = 0,
-            title = "Shopping Market",
-            amount = 1000.0,
-            transActionType = TransactionType.EXPENSE,
-            category = Category.FOOD,
-            date = Date()
-        )
-
-        check(
-            name = "Invaild - Repeated Id",
-            result = financeTrackerManager.addTransaction(transaction2),
-            expectedResult = false
-        )
-    }
-
-    fun addEmptyTitleTest() {
-        val transaction = Transaction(
-            id = 12,
-            title = "",
-            amount = 1000.0,
-            transActionType = TransactionType.EXPENSE,
-            category = Category.FOOD,
-            date = Date()
-        )
-        check(
-            name = "Invalid - empty title",
-            result = financeTrackerManager.addTransaction(transaction),
-            expectedResult = false
-        )
-    }
-
-    fun addNegativeAmount() {
-        val transaction = Transaction(
-            id = 1,
-            title = "Clothes",
-            amount = -100.0,
+            title = "t-shirt",
+            amount = 60.0,
             transActionType = TransactionType.EXPENSE,
             category = Category.SHOPPING,
             date = Date()
         )
         check(
-            name = "Invalid - negative amount",
-            result = financeTrackerManager.addTransaction(transaction),
-            expectedResult = false
+            name ="Edit with Valid Data",
+            result = financeTrackerManager.EditTransaction(transaction),
+            expectedResult = true
         )
     }
-
-    fun addZeroAmount() {
+    fun editPartialUpdate(){
         val transaction = Transaction(
-            id = 1,
-            title = "Food",
-            amount = 0.0,
+            id = 0,
+            title = "t-shirt",
+            amount = 100.0,
             transActionType = TransactionType.EXPENSE,
-            category = Category.FOOD,
+            category = Category.SHOPPING,
             date = Date()
         )
         check(
-            name = "Invalid - zero amount",
-            result = financeTrackerManager.addTransaction(transaction),
+            name = "Partial Update",
+            result = financeTrackerManager.EditTransaction(transaction),
+            expectedResult = true
+        )
+    }
+    fun EditwithNonExistentTransiction(){
+        val transaction = Transaction(
+            id = -5,
+            title = "t-shirt",
+            amount = 100.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.SHOPPING,
+            date = Date()
+        )
+        check(
+            name = "Edit with Non-Existent transiction",
+            result = financeTrackerManager.EditTransaction(transaction),
             expectedResult = false
         )
     }
 
-
-
-    fun runAddTests() {
-        addValidTest()
-        addRepeatedId()
-        addEmptyTitleTest()
-        addNegativeAmount()
-        addZeroAmount()
+    fun runEditTest(){
+        editWithValidData()
+        editPartialUpdate()
+        EditwithNonExistentTransiction()
     }
 
     fun runAllTests() {
-        runAddTests()
+        runEditTest()
     }
 
     private fun <T> check(
