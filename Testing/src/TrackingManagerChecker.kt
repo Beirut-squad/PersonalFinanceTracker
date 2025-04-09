@@ -69,10 +69,46 @@ class TrackingManagerChecker(
         )
     }
 
+    fun addNegativeAmount() {
+        val transaction = Transaction(
+            id = 1,
+            title = "Clothes",
+            amount = -100.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.SHOPPING,
+            date = Date()
+        )
+        check(
+            name = "Invalid - negative amount",
+            result = financeTrackerManager.addTransaction(transaction),
+            expectedResult = false
+        )
+    }
+
+    fun addZeroAmount() {
+        val transaction = Transaction(
+            id = 1,
+            title = "Food",
+            amount = 0.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.FOOD,
+            date = Date()
+        )
+        check(
+            name = "Invalid - zero amount",
+            result = financeTrackerManager.addTransaction(transaction),
+            expectedResult = false
+        )
+    }
+
+
+
     fun runAddTests() {
         addValidTest()
         addRepeatedId()
         addEmptyTitleTest()
+        addNegativeAmount()
+        addZeroAmount()
     }
 
     fun runAllTests() {
