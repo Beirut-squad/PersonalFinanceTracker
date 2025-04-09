@@ -115,6 +115,51 @@ class TrackingManagerChecker(
             expectedResult = false
         )
     }
+    fun editTransactionWithWhiteSpaceOnly() {
+        val transaction = Transaction(
+            id = 20,
+            title = " ",
+            amount = 100.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.FOOD,
+            date = Date()
+        )
+        check(
+            name = "Edit with whitespaces only",
+            result = financeTrackerManager.EditTransaction(transaction),
+            expectedResult = false
+        )
+    }
+    fun editTransactionMonthlySummary() {
+        val transaction = Transaction(
+            id = 21,
+            title = "Freelancer Project",
+            amount = 100.0,
+            transActionType = TransactionType.INCOME,
+            category = Category.SALARY,
+            date = Date()
+        )
+        check(
+            name = "Edit and Verify Monthly Summary Reflects Change",
+            result = financeTrackerManager.EditTransaction(transaction),
+            expectedResult = false
+        )
+    }
+    fun editTransactionUpdatesBalance() {
+        val transaction = Transaction(
+            id = 21,
+            title = "Salary Bonus",
+            amount = 750.0,
+            transActionType = TransactionType.INCOME,
+            category = Category.SALARY,
+            date = Date()
+        )
+        check(
+            name = "Edit and Verify Balance Reflects Change",
+            result = financeTrackerManager.EditTransaction(transaction),
+            expectedResult = true
+        )
+    }
 
     fun runEditTest(){
         editWithValidData()
