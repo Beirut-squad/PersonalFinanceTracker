@@ -104,7 +104,7 @@ class TrackingManagerChecker(
         val transaction = Transaction(
             id = 10,
             title = "any",
-            amount = 100000000000000000000000000.0,
+            amount = 1.8E308,
             transActionType = TransactionType.EXPENSE,
             category = Category.SHOPPING,
             date = Date()
@@ -120,6 +120,7 @@ class TrackingManagerChecker(
         editWithValidData()
         editPartialUpdate()
         EditwithNonExistentTransiction()
+        editWithEmptyDescription()
         editWithNegativeAmount()
         editWithAmountEqualZero()
         amountOutOfRange()
