@@ -11,4 +11,8 @@ class FinanceTrackerManagerImpl: FinanceTrackerManager {
     override fun clearTransactions(): Boolean {
         return true
     }
+
+    override fun editTransaction(transaction: Transaction): Boolean {
+        return false
+    }
 }
