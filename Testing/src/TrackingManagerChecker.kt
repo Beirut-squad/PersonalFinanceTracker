@@ -53,11 +53,76 @@ class TrackingManagerChecker(
             expectedResult = false
         )
     }
+    fun editWithEmptyDescription(){
+        val transaction = Transaction(
+            id = 10,
+            title = "",
+            amount = 100.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.SHOPPING,
+            date = Date()
+        )
+        check(
+            name = "edit with empty description",
+            result = financeTrackerManager.EditTransaction(transaction),
+            expectedResult = false
+        )
+    }
+
+    fun editWithNegativeAmount(){
+        val transaction = Transaction(
+            id = 10,
+            title = "efwef",
+            amount = -100.0,
+            transActionType = TransactionType.INCOME,
+            category = Category.SHOPPING,
+            date = Date()
+        )
+        check(
+            name = "edit with empty description",
+            result = financeTrackerManager.EditTransaction(transaction),
+            expectedResult = false
+        )
+    }
+
+    fun editWithAmountEqualZero(){
+        val transaction = Transaction(
+            id = 10,
+            title = "erer",
+            amount = 0.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.SHOPPING,
+            date = Date()
+        )
+        check(
+            name = "edit with empty description",
+            result = financeTrackerManager.EditTransaction(transaction),
+            expectedResult = false
+        )
+    }
+    fun amountOutOfRange(){
+        val transaction = Transaction(
+            id = 10,
+            title = "any",
+            amount = 100000000000000000000000000.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.SHOPPING,
+            date = Date()
+        )
+        check(
+            name = "edit with empty description",
+            result = financeTrackerManager.EditTransaction(transaction),
+            expectedResult = false
+        )
+    }
 
     fun runEditTest(){
         editWithValidData()
         editPartialUpdate()
         EditwithNonExistentTransiction()
+        editWithNegativeAmount()
+        editWithAmountEqualZero()
+        amountOutOfRange()
     }
 
     fun runAllTests() {
