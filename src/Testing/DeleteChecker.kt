@@ -45,6 +45,13 @@ class DeleteChecker (
             correctResult = false
         )
 
+        //Delete element from empty list, we can't delete element not found
+        check(
+            name = "Delete element in empty list",
+            result = financeTrackerManager.deleteTransaction(-99),
+            correctResult = false
+        )
+
     }
 
     fun check( name: String , result: Boolean, correctResult: Boolean)
