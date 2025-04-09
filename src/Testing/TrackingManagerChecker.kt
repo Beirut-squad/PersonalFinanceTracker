@@ -20,7 +20,7 @@ class TrackingManagerChecker(
         )
 
         check(
-            name = "Valid test",
+            name = "Adding a valid transaction to datasource",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = true
         )
@@ -36,7 +36,7 @@ class TrackingManagerChecker(
             date = Date()
         )
         check(
-            name = "Invalid - negative amount",
+            name = "Invalid - trying to add a transaction with negative amount",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
         )
@@ -52,7 +52,7 @@ class TrackingManagerChecker(
             date = Date()
         )
         check(
-            name = "Invalid - zero amount",
+            name = "Invalid - trying to add a transaction with zero amount",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
         )
@@ -80,7 +80,7 @@ class TrackingManagerChecker(
         )
 
         check(
-            name = "Invaild - Repeated Id",
+            name = "Invaild - trying to add a transaction with repeated id",
             result = financeTrackerManager.addTransaction(transaction2),
             expectedResult = false
         )
@@ -96,7 +96,7 @@ class TrackingManagerChecker(
             date = Date()
         )
         check(
-            name = "Invalid - empty title",
+            name = "Invalid - trying to add transaction with no title",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
         )
