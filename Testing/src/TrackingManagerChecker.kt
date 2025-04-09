@@ -25,8 +25,54 @@ class TrackingManagerChecker(
         )
     }
 
+    fun addRepeatedId() {
+        val transaction1 = Transaction(
+            id = 0,
+            title = "Shopping Market",
+            amount = 1000.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.FOOD,
+            date = Date()
+        )
+
+        financeTrackerManager.addTransaction(transaction1)
+
+        val transaction2 = Transaction(
+            id = 0,
+            title = "Shopping Market",
+            amount = 1000.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.FOOD,
+            date = Date()
+        )
+
+        check(
+            name = "Invaild - Repeated Id",
+            result = financeTrackerManager.addTransaction(transaction2),
+            expectedResult = false
+        )
+    }
+
+    fun addEmptyTitleTest() {
+        val transaction = Transaction(
+            id = 12,
+            title = "",
+            amount = 1000.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.FOOD,
+            date = Date()
+        )
+        check(
+            name = "Invalid - empty title",
+            result = financeTrackerManager.addTransaction(transaction),
+            expectedResult = false
+        )
+    }
+
     fun runAddTests() {
         addValidTest()
+        addRepeatedId()
+        addEmptyTitleTest()
     }
 
     fun runAllTests() {
