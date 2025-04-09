@@ -100,6 +100,62 @@ class EditTransactionChecker(
             expectedResult = false
         )
 
+        val transactionWithNegativeAmount = Transaction(
+            id = 9,
+            title = "Freelance Salary",
+            amount = -2500.0,
+            transActionType = TransactionType.INCOME,
+            category = Category.SALARY,
+            date = Date()
+        )
+        check(
+            name = "Should Fail To Edit When Amount Is Negative ",
+            result = financeTrackerManager.editTransaction(transactionWithNegativeAmount),
+            expectedResult = false
+        )
+
+        val transactionWithAmountEqualZero = Transaction(
+            id = 10,
+            title = "Snacks",
+            amount = 0.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.FOOD,
+            date = Date()
+        )
+        check(
+            name = "Should Fail To Edit When Amount EquaIs Zero\n ",
+            result = financeTrackerManager.editTransaction(transactionWithAmountEqualZero),
+            expectedResult = false
+        )
+
+        val transactionWithEmptyDescription = Transaction(
+            id = 7,
+            title = "",
+            amount = 500.0,
+            transActionType = TransactionType.EXPENSE,
+            category = Category.FEES,
+            date = Date()
+        )
+        check(
+            name = "Should Fail To enter empty description ",
+            result = financeTrackerManager.editTransaction(transactionWithEmptyDescription),
+            expectedResult = false
+        )
+
+        val transactionWithAmountOutOFRange =Transaction(
+            id = 9,
+            title = "Freelance Salary",
+            amount = 1.8E308,
+            transActionType = TransactionType.INCOME,
+            category = Category.SALARY,
+            date = Date()
+        )
+        check(
+            name = "Should Fail To Edit When Amount Exceeds Valid Range ",
+            result = financeTrackerManager.editTransaction(transactionWithAmountOutOFRange),
+            expectedResult = false
+        )
+
     }
 
 
