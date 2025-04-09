@@ -8,8 +8,9 @@ class TrackingManagerChecker(
     private val financeTrackerManager: FinanceTrackerManager
 ) {
 
-    fun addValidTest() {
-        val transaction = Transaction(
+    fun runAddTests() {
+        financeTrackerManager.clearTransactions()
+        var transaction = Transaction(
             id = 0,
             title = "College fees",
             amount = 500.0,
@@ -23,9 +24,9 @@ class TrackingManagerChecker(
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = true
         )
-    }
 
-    fun addRepeatedId() {
+        /***/
+        financeTrackerManager.clearTransactions()
         val transaction1 = Transaction(
             id = 0,
             title = "Shopping Market",
@@ -51,10 +52,10 @@ class TrackingManagerChecker(
             result = financeTrackerManager.addTransaction(transaction2),
             expectedResult = false
         )
-    }
 
-    fun addEmptyTitleTest() {
-        val transaction = Transaction(
+        /***/
+        financeTrackerManager.clearTransactions()
+        transaction = Transaction(
             id = 12,
             title = "",
             amount = 1000.0,
@@ -67,10 +68,10 @@ class TrackingManagerChecker(
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
         )
-    }
 
-    fun addNegativeAmount() {
-        val transaction = Transaction(
+        /***/
+        financeTrackerManager.clearTransactions()
+        transaction = Transaction(
             id = 1,
             title = "Clothes",
             amount = -100.0,
@@ -83,10 +84,10 @@ class TrackingManagerChecker(
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
         )
-    }
 
-    fun addZeroAmount() {
-        val transaction = Transaction(
+        /***/
+        financeTrackerManager.clearTransactions()
+        transaction = Transaction(
             id = 1,
             title = "Food",
             amount = 0.0,
@@ -99,16 +100,6 @@ class TrackingManagerChecker(
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
         )
-    }
-
-
-
-    fun runAddTests() {
-        addValidTest()
-        addRepeatedId()
-        addEmptyTitleTest()
-        addNegativeAmount()
-        addZeroAmount()
     }
 
     fun runAllTests() {
