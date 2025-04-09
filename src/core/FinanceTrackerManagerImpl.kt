@@ -8,6 +8,10 @@ class FinanceTrackerManagerImpl: FinanceTrackerManager {
         return false
     }
 
+    override fun deleteTransaction(id: Int): Boolean {
+        return false
+    }
+
     override fun clearTransactions(): Boolean {
         return true
     }
