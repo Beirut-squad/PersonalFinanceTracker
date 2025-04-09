@@ -11,6 +11,7 @@ class EditTransactionChecker(
 ) {
     fun editTransactionCheck() {
         // valid transaction edit : all fields are correct
+        financeTrackerManager.clearTransactions()
         val successfulTransaction = Transaction(
             id = 6,
             title = "t-shirt",
@@ -19,6 +20,7 @@ class EditTransactionChecker(
             category = Category.SHOPPING,
             date = Date()
         )
+        financeTrackerManager.addTransaction(successfulTransaction)
         check(
             name = "Should Successfully Edit Transaction  ",
             result = financeTrackerManager.editTransaction(successfulTransaction),
@@ -26,14 +28,16 @@ class EditTransactionChecker(
         )
 
         // valid partial transaction edit : only some fields changed
+        financeTrackerManager.clearTransactions()
         val successfulTransactionWithSomeFieldChanged = Transaction(
-            id = 30,
+            id = 6,
             title = "supermarket",
-            amount = 250.0,
+            amount = 60.0,
             transActionType = TransactionType.EXPENSE,
-            category = Category.FOOD,
+            category = Category.SHOPPING,
             date = Date()
         )
+        financeTrackerManager.addTransaction(successfulTransactionWithSomeFieldChanged)
         check(
             name = "Should Successfully Update Transaction With Partial Changes",
             result = financeTrackerManager.editTransaction(successfulTransactionWithSomeFieldChanged),
@@ -41,12 +45,13 @@ class EditTransactionChecker(
         )
 
         // invalid transaction edit : non existent ID
+        financeTrackerManager.clearTransactions()
         val transactionWithNonExistentID = Transaction(
             id = -4,
-            title = "Electric Bill",
-            amount = 300.0,
+            title = "Clothes",
+            amount = 60.0,
             transActionType = TransactionType.EXPENSE,
-            category = Category.FEES,
+            category = Category.SHOPPING,
             date = Date()
         )
         check(
@@ -56,6 +61,7 @@ class EditTransactionChecker(
         )
 
         // successful transaction : reflects changes in balance
+        financeTrackerManager.clearTransactions()
         val successfulTransactionToUpdateBalance = Transaction(
             id = 21,
             title = "Salary Bonus",
@@ -64,6 +70,7 @@ class EditTransactionChecker(
             category = Category.SALARY,
             date = Date()
         )
+        financeTrackerManager.addTransaction(successfulTransactionToUpdateBalance)
         check(
             name = "Should Update Account Balance After Successful Edit",
             result = financeTrackerManager.editTransaction(successfulTransactionToUpdateBalance),
@@ -71,6 +78,7 @@ class EditTransactionChecker(
         )
 
         // successful transaction : reflects changes in monthly summary
+        financeTrackerManager.clearTransactions()
         val successfulTransactionToUpdateMonthlySummary = Transaction(
             id = 21,
             title = "Freelancer Project",
@@ -79,6 +87,7 @@ class EditTransactionChecker(
             category = Category.SALARY,
             date = Date()
         )
+        financeTrackerManager.addTransaction(successfulTransactionToUpdateMonthlySummary)
         check(
             name = "Should Update Monthly Summary After Successful Edit",
             result = financeTrackerManager.editTransaction(successfulTransactionToUpdateMonthlySummary),
@@ -87,7 +96,7 @@ class EditTransactionChecker(
 
         // unsuccessful transaction : failed to make transaction when title is only spaces
         val unsuccessfulTransactionWithWhiteSpaceOnly = Transaction(
-            id = 20,
+            id = 21,
             title = " ",
             amount = 100.0,
             transActionType = TransactionType.EXPENSE,
@@ -102,8 +111,8 @@ class EditTransactionChecker(
 
         //Invalid: Should Fail To Edit When Amount Is Negative
         val transactionWithNegativeAmount = Transaction(
-            id = 9,
-            title = "Freelance Salary",
+            id = 21,
+            title = "Freelance Project",
             amount = -2500.0,
             transActionType = TransactionType.INCOME,
             category = Category.SALARY,
@@ -117,11 +126,11 @@ class EditTransactionChecker(
 
         // Invalid: Should Fail To Edit When Amount EquaIs Zero
         val transactionWithAmountEqualZero = Transaction(
-            id = 10,
-            title = "Snacks",
+            id = 21,
+            title = "Freelance Project",
             amount = 0.0,
-            transActionType = TransactionType.EXPENSE,
-            category = Category.FOOD,
+            transActionType = TransactionType.INCOME,
+            category = Category.SALARY,
             date = Date()
         )
         check(
@@ -132,11 +141,11 @@ class EditTransactionChecker(
 
         // Invalid: Should Fail To enter empty description
         val transactionWithEmptyDescription = Transaction(
-            id = 7,
+            id = 21,
             title = "",
-            amount = 500.0,
-            transActionType = TransactionType.EXPENSE,
-            category = Category.FEES,
+            amount = 1000.0,
+            transActionType = TransactionType.INCOME,
+            category = Category.SALARY,
             date = Date()
         )
         check(
@@ -149,7 +158,7 @@ class EditTransactionChecker(
 
         // Invalid: Should Fail To Edit When Amount Exceeds Valid Range
         val transactionWithAmountOutOFRange =Transaction(
-            id = 9,
+            id = 21,
             title = "Freelance Salary",
             amount = 1.8E308,
             transActionType = TransactionType.INCOME,
