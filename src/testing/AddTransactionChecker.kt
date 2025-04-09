@@ -4,7 +4,7 @@ import models.Transaction
 import models.TransactionType
 import java.util.*
 
-class TrackingManagerChecker(
+class AddTransactionChecker(
     private val financeTrackerManager: FinanceTrackerManager
 ) {
 
@@ -102,10 +102,6 @@ class TrackingManagerChecker(
         )
 
 
-    }
-
-    fun runAllTests() {
-        runAddTests()
     }
 
     private fun <T> check(

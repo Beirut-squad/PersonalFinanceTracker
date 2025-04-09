@@ -1,11 +1,11 @@
-package Testing
+package testing
 
 import core.FinanceTrackerManager
 import models.Category
 import models.Transaction
 import models.TransactionType
 import java.util.*
-class DeleteChecker (
+class DeleteTransactionChecker (
     private val financeTrackerManager: FinanceTrackerManager
 ) {
     fun runAllDeleteChecker() {
@@ -54,11 +54,15 @@ class DeleteChecker (
 
     }
 
-    fun check( name: String , result: Boolean, correctResult: Boolean)
-    {
-        if (result == correctResult)
-        {  println(" true - $name")}
-        else
-        { println(" false - $name")}
+    private fun <T> check(
+        name: String,
+        result: T,
+        correctResult: T
+    ) {
+        if (result == correctResult) {
+            println("\u001B[32mSuccess: $name")
+        } else {
+            println("\u001b[31mFailure: $name (Expected $correctResult but found $result)")
+        }
     }
 }
