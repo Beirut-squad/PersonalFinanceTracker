@@ -6,7 +6,8 @@ class InMemoryDataSource : FinanceTrackerDataSource {
     override var transactions: MutableList<Transaction> = emptyList<Transaction>().toMutableList()
 
     override fun addTransactions(transaction: Transaction) {
-        TODO("Not yet implemented")
+        this.transactions.add(transaction)
+
     }
 
     override fun editTransactions(transaction: Transaction) {

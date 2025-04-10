@@ -1,8 +1,9 @@
+package test
+
 import core.FinanceTrackerManager
 import models.Category
 import models.Transaction
 import models.TransactionType
-import testing.Checker
 import java.util.*
 
 class AddTransactionChecker(

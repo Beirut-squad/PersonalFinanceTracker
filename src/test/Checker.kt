@@ -1,4 +1,4 @@
-package testing
+package test
 // class that include print function for all check cases
 
 class Checker{
