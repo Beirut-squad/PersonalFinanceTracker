@@ -35,5 +35,6 @@ fun main() {
     deleteChecker.runAllDeleteChecker()
     editChecker.editTransactionCheck()
     viewChecker.checkBalanceReport()
+      viewMonthlySummerChecker.runAllMonthlySummaryChecks()
 
 }
