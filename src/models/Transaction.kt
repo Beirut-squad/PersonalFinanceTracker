@@ -16,7 +16,7 @@ data class Transaction(
 
         fun getNextId(): Int {
             lastId++
-            return lastId
+            return lastId-1
         }
     }
 

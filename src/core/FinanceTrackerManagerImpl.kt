@@ -14,6 +14,9 @@ class FinanceTrackerManagerImpl(private val ftDataSource: FinanceTrackerDataSour
 
         if (ftDataSource.transactions.any { it.id == transaction.id }){
             return false
+        }else if(transaction.id < 0){
+            return false
+
         }else if (transaction.title.trim().isBlank()){
             return false
         }else if(transaction.amount <= 0.0){
