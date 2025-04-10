@@ -2,26 +2,26 @@ package test
 
 import core.FinanceTrackerManager
 import core.FinanceTrackerManagerImpl
+import core.FinanceTrackerValidator
+import core.FinanceTrackerValidatorImp
 import datasource.FinanceTrackerDataSource
 import datasource.InMemoryDataSource
+import models.Category
+import models.Transaction
+import models.TransactionType
+import java.util.Date
 
 
 fun main() {
-
-
-
-
     val ftDataSource: FinanceTrackerDataSource = InMemoryDataSource()
-    val financeTrackerManager: FinanceTrackerManager = FinanceTrackerManagerImpl(ftDataSource)
+    val validator: FinanceTrackerValidator = FinanceTrackerValidatorImp()
+    val financeTrackerManager: FinanceTrackerManager = FinanceTrackerManagerImpl(ftDataSource, validator)
     val addChecker = AddTransactionChecker(financeTrackerManager)
-
-
-
     val deleteChecker = DeleteTransactionChecker(
-        financeTrackerManager = FinanceTrackerManagerImpl(ftDataSource)
+        financeTrackerManager = FinanceTrackerManagerImpl(ftDataSource, validator)
     )
     val editChecker = EditTransactionChecker(
-        financeTrackerManager = FinanceTrackerManagerImpl(ftDataSource)
+        financeTrackerManager = FinanceTrackerManagerImpl(ftDataSource, validator)
     )
     val viewChecker = FinanceTrackerViewerChecker(
         dataSource = FakeDataSource()
