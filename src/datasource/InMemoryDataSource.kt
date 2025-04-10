@@ -3,7 +3,7 @@ package datasource
 import models.Transaction
 
 class InMemoryDataSource : FinanceTrackerDataSource {
-    override var transactions: MutableList<Transaction> = emptyList<Transaction>().toMutableList()
+    private val transactions: MutableList<Transaction> = mutableListOf()
 
     override fun addTransactions(transaction: Transaction) {
         this.transactions.add(transaction)
@@ -19,15 +19,15 @@ class InMemoryDataSource : FinanceTrackerDataSource {
         }
     }
 
-    override fun viewTransactions(transaction: Transaction) {
-        TODO("Not yet implemented")
+    override fun getTransactions(): List<Transaction> {
+        return transactions
     }
 
     override fun deleteTransactions(transaction: Transaction) {
-        TODO("Not yet implemented")
+        transactions.remove(transaction)
     }
 
     override fun clear() {
-        TODO("Not yet implemented")
+        transactions.clear()
     }
 }

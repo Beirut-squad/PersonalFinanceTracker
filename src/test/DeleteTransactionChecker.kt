@@ -7,7 +7,7 @@ import models.TransactionType
 import java.util.*
 class DeleteTransactionChecker (
     private val financeTrackerManager: FinanceTrackerManager,
-    val printChecks: Checker = Checker()
+    private val checker: Checker = Checker()
 ) {
     fun runAllDeleteChecker() {
         financeTrackerManager.clearTransactions()
@@ -30,21 +30,21 @@ class DeleteTransactionChecker (
         financeTrackerManager.addTransaction(value1)
 
         //Delete element in list, it will delete successfully
-        printChecks.check(
+        checker.check(
             name = "Delete element in the list",
             result = financeTrackerManager.deleteTransaction(value1.id),
             expectedResult = true
         )
         financeTrackerManager.addTransaction(value1)
         //Delete element not in the list, we can't delete element not found
-        printChecks.check(
+        checker.check(
             name = "Delete element not in the list",
             result = financeTrackerManager.deleteTransaction(-1),
             expectedResult = false
         )
 
         //Delete element with incorrect id, we can't delete element not found
-        printChecks.check(
+        checker.check(
             name = "Element with wrong id",
             result = financeTrackerManager.deleteTransaction(-99),
             expectedResult = false
@@ -52,7 +52,7 @@ class DeleteTransactionChecker (
 
         financeTrackerManager.clearTransactions()
         //Delete element from empty list, we can't delete element not found
-        printChecks.check(
+        checker.check(
             name = "Delete element in empty list",
             result = financeTrackerManager.deleteTransaction(-99),
             expectedResult = false

@@ -1,12 +1,13 @@
 package core
 
+import models.TotalTransactions
 import models.Transaction
 
 interface FinanceTrackerManager {
-    //todo: add methods to handle transactions and generate reports
     fun addTransaction(transaction: Transaction): Boolean
     fun deleteTransaction(id:Int): Boolean
-    fun clearTransactions(): Boolean
+    fun clearTransactions()
     fun editTransaction(transaction: Transaction) : Boolean
-    fun viewMonthlySummery(month: Int , year: Int): List<Transaction>
+    fun getBalanceReport(): TotalTransactions
+    fun getMonthlySummery(month: Int, year: Int): List<Transaction>
 }

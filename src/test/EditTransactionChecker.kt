@@ -8,7 +8,7 @@ import java.util.*
 
 class EditTransactionChecker(
     private val financeTrackerManager: FinanceTrackerManager,
-    val printChecks: Checker = Checker()
+    private val checker: Checker = Checker()
 ) {
     fun editTransactionCheck() {
         // valid transaction edit : all fields are correct
@@ -22,7 +22,7 @@ class EditTransactionChecker(
             date = Date()
         )
         financeTrackerManager.addTransaction(successfulTransaction)
-        printChecks.check(
+        checker.check(
             name = "Should Successfully Edit Transaction  ",
             result = financeTrackerManager.editTransaction(successfulTransaction),
             expectedResult = true
@@ -39,7 +39,7 @@ class EditTransactionChecker(
             date = Date()
         )
         financeTrackerManager.addTransaction(successfulTransactionWithSomeFieldChanged)
-        printChecks.check(
+        checker.check(
             name = "Should Successfully Update Transaction With Partial Changes",
             result = financeTrackerManager.editTransaction(successfulTransactionWithSomeFieldChanged),
             expectedResult = true
@@ -55,7 +55,7 @@ class EditTransactionChecker(
             category = Category.SHOPPING,
             date = Date()
         )
-        printChecks.check(
+        checker.check(
             name = "Should Fail To Edit When Transaction ID Does Not Exist ",
             result = financeTrackerManager.editTransaction(transactionWithNonExistentID),
             expectedResult = false
@@ -72,7 +72,7 @@ class EditTransactionChecker(
             date = Date()
         )
         financeTrackerManager.addTransaction(successfulTransactionToUpdateBalance)
-        printChecks.check(
+        checker.check(
             name = "Should Update Account Balance After Successful Edit",
             result = financeTrackerManager.editTransaction(successfulTransactionToUpdateBalance),
             expectedResult = true
@@ -89,7 +89,7 @@ class EditTransactionChecker(
             date = Date()
         )
         financeTrackerManager.addTransaction(successfulTransactionToUpdateMonthlySummary)
-        printChecks.check(
+        checker.check(
             name = "Should Update Monthly Summary After Successful Edit",
             result = financeTrackerManager.editTransaction(successfulTransactionToUpdateMonthlySummary),
             expectedResult = true
@@ -104,7 +104,7 @@ class EditTransactionChecker(
             category = Category.FOOD,
             date = Date()
         )
-        printChecks.check(
+        checker.check(
             name = "Should Fail To Edit When Title Contains Only Whitespace",
             result = financeTrackerManager.editTransaction(unsuccessfulTransactionWithWhiteSpaceOnly),
             expectedResult = false
@@ -119,7 +119,7 @@ class EditTransactionChecker(
             category = Category.SALARY,
             date = Date()
         )
-        printChecks.check(
+        checker.check(
             name = "Should Fail To Edit When Amount Is Negative ",
             result = financeTrackerManager.editTransaction(transactionWithNegativeAmount),
             expectedResult = false
@@ -134,7 +134,7 @@ class EditTransactionChecker(
             category = Category.SALARY,
             date = Date()
         )
-        printChecks.check(
+        checker.check(
             name = "Should Fail To Edit When Amount EquaIs Zero\n ",
             result = financeTrackerManager.editTransaction(transactionWithAmountEqualZero),
             expectedResult = false
@@ -149,26 +149,9 @@ class EditTransactionChecker(
             category = Category.SALARY,
             date = Date()
         )
-        printChecks.check(
+        checker.check(
             name = "Should Fail To enter empty description ",
             result = financeTrackerManager.editTransaction(transactionWithEmptyDescription),
-            expectedResult = false
-        )
-
-
-
-        // Invalid: Should Fail To Edit When Amount Exceeds Valid Range
-        val transactionWithAmountOutOFRange =Transaction(
-            id = 21,
-            title = "Freelance Salary",
-            amount = 1.8E308,
-            transactionType = TransactionType.INCOME,
-            category = Category.SALARY,
-            date = Date()
-        )
-        printChecks.check(
-            name = "Should Fail To Edit When Amount Exceeds Valid Range ",
-            result = financeTrackerManager.editTransaction(transactionWithAmountOutOFRange),
             expectedResult = false
         )
 

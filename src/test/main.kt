@@ -1,40 +1,42 @@
 package test
 
-import core.FinanceTrackerManager
-import core.FinanceTrackerManagerImpl
-import core.FinanceTrackerValidator
-import core.FinanceTrackerValidatorImp
+import core.*
 import datasource.FinanceTrackerDataSource
 import datasource.InMemoryDataSource
-import models.Category
-import models.Transaction
-import models.TransactionType
-import java.util.Date
 
 
 fun main() {
-    val ftDataSource: FinanceTrackerDataSource = InMemoryDataSource()
+    val dataSource: FinanceTrackerDataSource = InMemoryDataSource()
     val validator: FinanceTrackerValidator = FinanceTrackerValidatorImp()
-    val financeTrackerManager: FinanceTrackerManager = FinanceTrackerManagerImpl(ftDataSource, validator)
+    val financeTrackerManager: FinanceTrackerManager = FinanceTrackerManagerImpl(dataSource, validator)
+
     val addChecker = AddTransactionChecker(financeTrackerManager)
     val deleteChecker = DeleteTransactionChecker(
-        financeTrackerManager = FinanceTrackerManagerImpl(ftDataSource, validator)
+        financeTrackerManager = FinanceTrackerManagerImpl(dataSource, validator)
     )
     val editChecker = EditTransactionChecker(
-        financeTrackerManager = FinanceTrackerManagerImpl(ftDataSource, validator)
+        financeTrackerManager = FinanceTrackerManagerImpl(dataSource, validator)
     )
-    val viewChecker = FinanceTrackerViewerChecker(
-        dataSource = FakeDataSource()
-    )
-
-    val viewMonthlySummeryChecker = GetMonthlySummeryChecker(
-        financeTrackerManager = FinanceTrackerManagerImpl(ftDataSource)
+    val balanceReportChecker = BalanceReportChecker(
+        financeTrackerManager = financeTrackerManager
     )
 
+    val getMonthlySummeryChecker = GetMonthlySummeryChecker(
+        financeTrackerManager = financeTrackerManager
+    )
+
+    dataSource.clear()
     addChecker.runAddTests()
-    deleteChecker.runAllDeleteChecker()
-    editChecker.editTransactionCheck()
-    viewChecker.checkBalanceReport()
-      viewMonthlySummerChecker.runAllMonthlySummaryChecks()
 
+    dataSource.clear()
+    deleteChecker.runAllDeleteChecker()
+
+    dataSource.clear()
+    editChecker.editTransactionCheck()
+
+    dataSource.clear()
+    balanceReportChecker.checkBalanceReport()
+
+    dataSource.clear()
+    getMonthlySummeryChecker.runAllMonthlySummaryChecks()
 }
