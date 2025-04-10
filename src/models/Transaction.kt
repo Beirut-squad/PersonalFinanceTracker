@@ -2,8 +2,6 @@ package models
 
 import java.util.Date
 import java.util.UUID
-
-// TODO: Implement
 data class Transaction(
     val id: Int,
     val title: String,
@@ -12,4 +10,3 @@ data class Transaction(
     val category: Category,
     val date: Date
 )
-
