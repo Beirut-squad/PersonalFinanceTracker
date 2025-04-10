@@ -1,6 +1,4 @@
-import Testing.FakeDataSource
-import Testing.ViewMonthlySummeryChecker
-import core.FinanceTrackerManager
+import testing.ViewMonthlySummeryChecker
 import core.FinanceTrackerManagerImpl
 
 fun main() {
