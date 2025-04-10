@@ -13,11 +13,43 @@ class FinanceTrackerManagerImpl(
 ): FinanceTrackerManager {
 
     override fun addTransaction(transaction: Transaction): Boolean {
-        return false
+
+        if (ftDataSource.transactions.any { it.id == transaction.id }){
+            return false
+        }else if(transaction.id < 0){
+            return false
+
+        }else if (transaction.title.trim().isBlank()){
+            return false
+        }else if(transaction.amount <= 0.0){
+            return false
+        }
+
+
+
+        ftDataSource.addTransactions(transaction)
+        return true
     }
 
     override fun deleteTransaction(id: Int): Boolean {
-        return false
+
+        val transactions = ftDataSource.transactions
+
+        if (id < 0) {
+            return false
+        }
+
+        if (transactions.isEmpty()) {
+            return false
+        }
+
+        val deletedTransaction = transactions.find { id == it.id }
+
+        if (deletedTransaction == null) {
+            return false
+        }
+
+        return transactions.remove(deletedTransaction)
     }
 
     override fun clearTransactions(): Boolean {
@@ -35,5 +67,9 @@ class FinanceTrackerManagerImpl(
         }
 
         return false
+    }
+
+    override fun viewMonthlySummery(month: Int, year: Int): List<Transaction> {
+        return emptyList()
     }
 }
