@@ -8,4 +8,5 @@ interface FinanceTrackerManager {
     fun deleteTransaction(id:Int): Boolean
     fun clearTransactions(): Boolean
     fun editTransaction(transaction: Transaction) : Boolean
+    fun viewMonthlySummery(month: Int , year: Int) : List<Transaction>
 }

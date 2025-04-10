@@ -1,19 +1,11 @@
-import testing.DeleteTransactionChecker
-import testing.EditTransactionChecker
+import Testing.FakeDataSource
+import Testing.ViewMonthlySummeryChecker
+import core.FinanceTrackerManager
 import core.FinanceTrackerManagerImpl
 
 fun main() {
-    val addChecker = AddTransactionChecker(
-        financeTrackerManager = FinanceTrackerManagerImpl()
-    )
-    val deleteChecker = DeleteTransactionChecker(
-        financeTrackerManager = FinanceTrackerManagerImpl()
-    )
-    val editChecker = EditTransactionChecker(
-        financeTrackerManager = FinanceTrackerManagerImpl()
-    )
+    val financeTrackerManager = FinanceTrackerManagerImpl()
+    val viewMonthlySummeryChecker = ViewMonthlySummeryChecker(financeTrackerManager)
+    viewMonthlySummeryChecker.runAllMonthlySummaryChecks()
 
-    addChecker.runAddTests()
-    deleteChecker.runAllDeleteChecker()
-    editChecker.editTransactionCheck()
 }

@@ -19,4 +19,8 @@ class FinanceTrackerManagerImpl: FinanceTrackerManager {
     override fun editTransaction(transaction: Transaction): Boolean {
         return false
     }
+
+    override fun viewMonthlySummery(month: Int, year: Int): List<Transaction> {
+        return emptyList()
+    }
 }

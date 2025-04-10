@@ -1,9 +1,6 @@
 import core.DefaultFinanceTrackerViewer
 import datasource.FinanceTrackerDataSource
-import models.Category
-import models.TotalTransactions
-import models.Transaction
-import models.TransactionType
+import models.*
 import java.util.Date
 
 class FinanceTrackerViewerTests(private val dataSource: FinanceTrackerDataSource) {
@@ -20,21 +17,21 @@ class FinanceTrackerViewerTests(private val dataSource: FinanceTrackerDataSource
                 id = 1,
                 title = "buy food",
                 amount = 30.0,
-                transactionType = TransactionType.Expenses,
+                transActionType = TransactionType.EXPENSE,
                 category = Category.FOOD,
                 date = Date()
             ), Transaction(
                 id = 2,
                 title = "monthly salary",
                 amount = 3000.0,
-                transactionType = TransactionType.Income,
+                transActionType = TransactionType.INCOME,
                 category = Category.SALARY,
                 date = Date()
             ), Transaction(
                 id = 3,
                 title = " ",
                 amount = 100.0,
-                transactionType = TransactionType.Expenses,
+                transActionType = TransactionType.EXPENSE,
                 category = Category.SHOPPING,
                 date = Date()
             )
