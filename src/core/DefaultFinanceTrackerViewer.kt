@@ -2,7 +2,6 @@ package core
 
 import datasource.FinanceTrackerDataSource
 import models.*
-import java.util.*
 
 class DefaultFinanceTrackerViewer(private val dataSource: FinanceTrackerDataSource) : FinanceTrackerViewer {
 
