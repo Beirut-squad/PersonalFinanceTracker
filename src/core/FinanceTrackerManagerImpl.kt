@@ -10,7 +10,22 @@ import java.util.*
 class FinanceTrackerManagerImpl(private val ftDataSource: FinanceTrackerDataSource): FinanceTrackerManager {
 
     override fun addTransaction(transaction: Transaction): Boolean {
-        return false
+
+        if (ftDataSource.transactions.any { it.id == transaction.id }){
+            return false
+        }else if(transaction.id < 0){
+            return false
+
+        }else if (transaction.title.trim().isBlank()){
+            return false
+        }else if(transaction.amount <= 0.0){
+            return false
+        }
+
+
+
+        ftDataSource.addTransactions(transaction)
+        return true
     }
 
     override fun deleteTransaction(id: Int): Boolean {
@@ -26,6 +41,13 @@ class FinanceTrackerManagerImpl(private val ftDataSource: FinanceTrackerDataSour
     }
 
     override fun viewMonthlySummery(month: Int, year: Int): List<Transaction> {
-        return emptyList()
+        return ftDataSource.transactions.filter { transaction ->
+            val cal = Calendar.getInstance()
+            cal.time = transaction.date
+            val transactionMonth = cal.get(Calendar.MONTH) + 1
+            val transactionYear = cal.get(Calendar.YEAR)
+
+            transactionMonth == month && transactionYear == year
+        }
     }
 }

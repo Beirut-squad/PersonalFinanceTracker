@@ -10,9 +10,9 @@ class GetMonthlySummeryChecker(
     private val financeTrackerManager: FinanceTrackerManager,
     private val printChecks: Checker = Checker()
 ) {
-    fun runAllMonthlySummaryChecks() {
-        financeTrackerManager.clearTransactions()
 
+    fun runAllMonthlySummaryChecks() {
+        val transactions : MutableList<Transaction> = mutableListOf()
         val calendar = Calendar.getInstance()
 
         // Transaction in March 2024
@@ -25,6 +25,7 @@ class GetMonthlySummeryChecker(
             category = Category.FOOD,
             date = calendar.time
         )
+        transactions.add(transaction1)
 
         // Transaction in March 2024
         calendar.set(2024, Calendar.MARCH, 15)
@@ -36,6 +37,7 @@ class GetMonthlySummeryChecker(
             category = Category.SALARY,
             date = calendar.time
         )
+        transactions.add(transaction2)
 
         // Transaction in April 2024
         calendar.set(2024, Calendar.APRIL, 10)
@@ -47,11 +49,7 @@ class GetMonthlySummeryChecker(
             category = Category.FOOD,
             date = calendar.time
         )
-
-        // Add all transactions
-        financeTrackerManager.addTransaction(transaction1)
-        financeTrackerManager.addTransaction(transaction2)
-        financeTrackerManager.addTransaction(transaction3)
+        transactions.add(transaction3)
 
         val validDate = financeTrackerManager.viewMonthlySummery(3, 2024) // March is month 3
         val invalidDate = financeTrackerManager.viewMonthlySummery(10, 2026)
@@ -60,25 +58,25 @@ class GetMonthlySummeryChecker(
 
         printChecks.check(
             name = "Summary should return only March 2024 transactions",
-            result = validDate.map { it.id }.sorted(),
-            expectedResult = listOf(1, 2)
+            result = validDate,
+            expectedResult = listOf(transaction1, transaction2)
         )
 
         printChecks.check(
             name = "When the date is wrong , should return empty list ",
-            result = invalidDate.map { it.id }.sorted(),
+            result = invalidDate,
             expectedResult = listOf()
         )
 
         printChecks.check(
             name = "When the month is wrong , should return empty list ",
-            result = invalidMonth.map { it.id }.sorted(),
+            result = invalidMonth,
             expectedResult = listOf()
         )
 
         printChecks.check(
             name = "When the year is wrong , should return empty list ",
-            result = invalidYear.map { it.id }.sorted(),
+            result = invalidYear,
             expectedResult = listOf()
         )
 
