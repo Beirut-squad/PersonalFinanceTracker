@@ -1,6 +1,12 @@
 package models
 
-// TODO: Implement
+import java.util.Date
+import java.util.UUID
 data class Transaction(
-    val tmp: String
+    val id: Int,
+    val title: String,
+    val amount: Double,
+    val transactionType: TransactionType,
+    val category: Category,
+    val date: Date
 )
