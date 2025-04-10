@@ -1,15 +1,17 @@
+package test
+
 import core.DefaultFinanceTrackerViewer
 import datasource.FinanceTrackerDataSource
 import models.Category
 import models.TotalTransactions
 import models.Transaction
 import models.TransactionType
-import testing.Checker
 import java.util.Date
 
 class FinanceTrackerViewerChecker (
     private val dataSource: FinanceTrackerDataSource, 
-    val printChecks:Checker = Checker()) {
+    val printChecks: Checker = Checker()
+) {
 
     fun checkBalanceReport() {
         printChecks.check(

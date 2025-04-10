@@ -1,4 +1,4 @@
-package testing
+package test
 
 import core.FinanceTrackerManager
 import models.Category
