@@ -20,7 +20,7 @@ class ViewMonthlySummeryChecker(
             id = 1,
             title = "Rent",
             amount = 800.0,
-            transActionType = TransactionType.EXPENSE,
+            transactionType = TransactionType.EXPENSE,
             category = Category.FOOD,
             date = calendar.time
         )
@@ -31,7 +31,7 @@ class ViewMonthlySummeryChecker(
             id = 2,
             title = "Salary",
             amount = 3000.0,
-            transActionType = TransactionType.INCOME,
+            transactionType = TransactionType.INCOME,
             category = Category.SALARY,
             date = calendar.time
         )
@@ -42,7 +42,7 @@ class ViewMonthlySummeryChecker(
             id = 3,
             title = "Groceries",
             amount = 150.0,
-            transActionType = TransactionType.EXPENSE,
+            transactionType = TransactionType.EXPENSE,
             category = Category.FOOD,
             date = calendar.time
         )
