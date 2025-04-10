@@ -1,12 +1,13 @@
-package datasource
+package Testing
 
+import datasource.FinanceTrackerDataSource
 import models.Transaction
 
-class InMemoryDataSource : FinanceTrackerDataSource {
+class FakeDataSource : FinanceTrackerDataSource {
     override var transactions: MutableList<Transaction> = emptyList<Transaction>().toMutableList()
 
     override fun addTransactions(transaction: Transaction) {
-        TODO("Not yet implemented")
+        transactions.add(transaction)
     }
 
     override fun editTransactions(transaction: Transaction) {
@@ -24,4 +25,5 @@ class InMemoryDataSource : FinanceTrackerDataSource {
     override fun clear() {
         TODO("Not yet implemented")
     }
+
 }
