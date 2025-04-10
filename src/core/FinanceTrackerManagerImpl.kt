@@ -7,7 +7,10 @@ import models.Transaction
 import models.TransactionType
 import java.util.*
 
-class FinanceTrackerManagerImpl(private val ftDataSource: FinanceTrackerDataSource): FinanceTrackerManager {
+class FinanceTrackerManagerImpl(
+    private val ftDataSource: FinanceTrackerDataSource,
+    private val validator: FinanceTrackerValidator
+): FinanceTrackerManager {
 
     override fun addTransaction(transaction: Transaction): Boolean {
         return false
@@ -22,6 +25,15 @@ class FinanceTrackerManagerImpl(private val ftDataSource: FinanceTrackerDataSour
     }
 
     override fun editTransaction(transaction: Transaction): Boolean {
+        if (!validator.validateTransaction(transaction)) return false
+
+        for (existingTransaction in ftDataSource.transactions) {
+            if (transaction.id == existingTransaction.id) {
+                ftDataSource.editTransactions(transaction)
+                return true
+            }
+        }
+
         return false
     }
 
