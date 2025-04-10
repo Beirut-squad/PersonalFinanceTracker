@@ -1,9 +1,14 @@
 package core
 
+import datasource.FinanceTrackerDataSource
+import datasource.InMemoryDataSource
+import models.Category
 import models.Transaction
+import models.TransactionType
+import java.util.*
 
-class FinanceTrackerManagerImpl: FinanceTrackerManager {
-    //todo: implement methods to handle transactions and generate reports
+class FinanceTrackerManagerImpl(private val ftDataSource: FinanceTrackerDataSource): FinanceTrackerManager {
+
     override fun addTransaction(transaction: Transaction): Boolean {
         return false
     }

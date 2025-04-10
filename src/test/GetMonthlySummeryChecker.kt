@@ -1,4 +1,4 @@
-package testing
+package test
 
 import core.FinanceTrackerManager
 import models.Category
@@ -6,7 +6,7 @@ import models.Transaction
 import models.TransactionType
 import java.util.*
 
-class ViewMonthlySummeryChecker(
+class GetMonthlySummeryChecker(
     private val financeTrackerManager: FinanceTrackerManager,
     private val printChecks: Checker = Checker()
 ) {
