@@ -1,9 +1,10 @@
 package core
 
+import datasource.FinanceTrackerDataSource
 import models.*
 import java.util.*
 
-class DefaultFinanceTrackerViewer : FinanceTrackerViewer {
+class DefaultFinanceTrackerViewer(private val dataSource: FinanceTrackerDataSource) : FinanceTrackerViewer {
 
     override fun balanceReport(): TotalTransactions {
         // todo: implement methods to get balance reports
