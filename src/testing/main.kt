@@ -18,7 +18,6 @@ fun main() {
         dataSource = FakeDataSource()
     )
 
-
     addChecker.runAddTests()
     deleteChecker.runAllDeleteChecker()
     editChecker.editTransactionCheck()

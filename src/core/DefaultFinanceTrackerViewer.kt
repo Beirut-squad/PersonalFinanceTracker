@@ -8,7 +8,7 @@ class DefaultFinanceTrackerViewer(private val dataSource: FinanceTrackerDataSour
 
     override fun balanceReport(): TotalTransactions {
         // todo: implement methods to get balance reports
-        return TotalTransactions(transactions = emptyList())
+        return TotalTransactions(transactions = dataSource.transactions)
     }
 
 }
