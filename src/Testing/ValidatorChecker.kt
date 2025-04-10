@@ -1,4 +1,0 @@
-package Testing
-
-class ValidatorChecker {
-}

@@ -2,10 +2,12 @@ import core.FinanceTrackerManager
 import models.Category
 import models.Transaction
 import models.TransactionType
+import testing.Checker
 import java.util.*
 
 class AddTransactionChecker(
-    private val financeTrackerManager: FinanceTrackerManager
+    private val financeTrackerManager: FinanceTrackerManager,
+    val printChecks: Checker = Checker()
 ) {
 
     fun runAddTests() {
@@ -14,12 +16,12 @@ class AddTransactionChecker(
             id = 0,
             title = "College fees",
             amount = 500.0,
-            transActionType = TransactionType.EXPENSE,
+            transactionType = TransactionType.EXPENSE,
             category = Category.FEES,
             date = Date()
         )
 
-        check(
+        printChecks.check(
             name = "Adding a valid transaction to datasource",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = true
@@ -31,11 +33,11 @@ class AddTransactionChecker(
             id = 1,
             title = "Clothes",
             amount = -100.0,
-            transActionType = TransactionType.EXPENSE,
+            transactionType = TransactionType.EXPENSE,
             category = Category.SHOPPING,
             date = Date()
         )
-        check(
+        printChecks.check(
             name = "Invalid - trying to add a transaction with negative amount",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
@@ -47,11 +49,11 @@ class AddTransactionChecker(
             id = 1,
             title = "Food",
             amount = 0.0,
-            transActionType = TransactionType.EXPENSE,
+            transactionType = TransactionType.EXPENSE,
             category = Category.FOOD,
             date = Date()
         )
-        check(
+        printChecks.check(
             name = "Invalid - trying to add a transaction with zero amount",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
@@ -63,7 +65,7 @@ class AddTransactionChecker(
             id = 0,
             title = "Shopping Market",
             amount = 1000.0,
-            transActionType = TransactionType.EXPENSE,
+            transactionType = TransactionType.EXPENSE,
             category = Category.FOOD,
             date = Date()
         )
@@ -74,12 +76,12 @@ class AddTransactionChecker(
             id = 0,
             title = "Shopping Market",
             amount = 1000.0,
-            transActionType = TransactionType.EXPENSE,
+            transactionType = TransactionType.EXPENSE,
             category = Category.FOOD,
             date = Date()
         )
 
-        check(
+        printChecks.check(
             name = "Invaild - trying to add a transaction with repeated id",
             result = financeTrackerManager.addTransaction(transaction2),
             expectedResult = false
@@ -91,11 +93,11 @@ class AddTransactionChecker(
             id = 12,
             title = "",
             amount = 1000.0,
-            transActionType = TransactionType.EXPENSE,
+            transactionType = TransactionType.EXPENSE,
             category = Category.FOOD,
             date = Date()
         )
-        check(
+        printChecks.check(
             name = "Invalid - trying to add transaction with no title",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
@@ -104,15 +106,4 @@ class AddTransactionChecker(
 
     }
 
-    private fun <T> check(
-        name: String,
-        result: T,
-        expectedResult: T
-    ) {
-        if (result == expectedResult) {
-            println("\u001B[32mSuccess: $name")
-        } else {
-            println("\u001b[31mFailure: $name (Expected $expectedResult but found $result)")
-        }
-    }
 }

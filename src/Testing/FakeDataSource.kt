@@ -1,4 +1,4 @@
-package Testing
+package testing
 
 import datasource.FinanceTrackerDataSource
 import models.Transaction
