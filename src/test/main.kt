@@ -27,10 +27,14 @@ fun main() {
         dataSource = FakeDataSource()
     )
 
+    val viewMonthlySummeryChecker = GetMonthlySummeryChecker(
+        financeTrackerManager = FinanceTrackerManagerImpl(ftDataSource)
+    )
 
     addChecker.runAddTests()
     deleteChecker.runAllDeleteChecker()
     editChecker.editTransactionCheck()
     viewChecker.checkBalanceReport()
+      viewMonthlySummerChecker.runAllMonthlySummaryChecks()
 
 }
