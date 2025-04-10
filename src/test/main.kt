@@ -11,13 +11,9 @@ import java.util.Date
 
 
 fun main() {
-
-
     val ftDataSource: FinanceTrackerDataSource = InMemoryDataSource()
     val financeTrackerManager: FinanceTrackerManager = FinanceTrackerManagerImpl(ftDataSource)
     val addChecker = AddTransactionChecker(financeTrackerManager)
-
-
     val deleteChecker = DeleteTransactionChecker(
         financeTrackerManager = FinanceTrackerManagerImpl(ftDataSource)
     )

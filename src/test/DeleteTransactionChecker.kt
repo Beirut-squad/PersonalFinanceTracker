@@ -35,20 +35,18 @@ class DeleteTransactionChecker (
             result = financeTrackerManager.deleteTransaction(value1.id),
             expectedResult = true
         )
-
-        financeTrackerManager.deleteTransaction(value1.id)
+        financeTrackerManager.addTransaction(value1)
         //Delete element not in the list, we can't delete element not found
         printChecks.check(
             name = "Delete element not in the list",
-            result = financeTrackerManager.deleteTransaction(0),
+            result = financeTrackerManager.deleteTransaction(-1),
             expectedResult = false
         )
 
-        financeTrackerManager.addTransaction(value2)
         //Delete element with incorrect id, we can't delete element not found
         printChecks.check(
             name = "Element with wrong id",
-            result = financeTrackerManager.deleteTransaction(-1),
+            result = financeTrackerManager.deleteTransaction(-99),
             expectedResult = false
         )
 
