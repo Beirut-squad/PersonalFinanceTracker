@@ -11,7 +11,12 @@ class InMemoryDataSource : FinanceTrackerDataSource {
     }
 
     override fun editTransactions(transaction: Transaction) {
-        TODO("Not yet implemented")
+        for (exitingTransaction in transactions){
+            if (exitingTransaction.id == transaction.id){
+                transactions.remove(exitingTransaction)
+                transactions.add(transaction)
+            }
+        }
     }
 
     override fun viewTransactions(transaction: Transaction) {
