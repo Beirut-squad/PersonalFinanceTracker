@@ -8,7 +8,7 @@ import java.util.*
 
 class AddTransactionChecker(
     private val financeTrackerManager: FinanceTrackerManager,
-    val printChecks: Checker = Checker()
+    private val checker: Checker = Checker()
 ) {
 
     fun runAddTests() {
@@ -22,7 +22,7 @@ class AddTransactionChecker(
             date = Date()
         )
 
-        printChecks.check(
+        checker.check(
             name = "Adding a valid transaction to datasource",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = true
@@ -38,7 +38,7 @@ class AddTransactionChecker(
             category = Category.SHOPPING,
             date = Date()
         )
-        printChecks.check(
+        checker.check(
             name = "Invalid - trying to add a transaction with negative amount",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
@@ -54,7 +54,7 @@ class AddTransactionChecker(
             category = Category.FOOD,
             date = Date()
         )
-        printChecks.check(
+        checker.check(
             name = "Invalid - trying to add a transaction with zero amount",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false
@@ -82,7 +82,7 @@ class AddTransactionChecker(
             date = Date()
         )
 
-        printChecks.check(
+        checker.check(
             name = "Invaild - trying to add a transaction with repeated id",
             result = financeTrackerManager.addTransaction(transaction2),
             expectedResult = false
@@ -98,7 +98,7 @@ class AddTransactionChecker(
             category = Category.FOOD,
             date = Date()
         )
-        printChecks.check(
+        checker.check(
             name = "Invalid - trying to add transaction with no title",
             result = financeTrackerManager.addTransaction(transaction),
             expectedResult = false

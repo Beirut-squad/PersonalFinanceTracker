@@ -1,25 +1,24 @@
 package test
 
-import core.DefaultFinanceTrackerViewer
-import datasource.FinanceTrackerDataSource
+import core.FinanceTrackerManager
 import models.Category
 import models.TotalTransactions
 import models.Transaction
 import models.TransactionType
 import java.util.Date
 
-class FinanceTrackerViewerChecker (
-    private val dataSource: FinanceTrackerDataSource, 
-    val printChecks: Checker = Checker()
+class BalanceReportChecker (
+    private val financeTrackerManager: FinanceTrackerManager,
+    private val checker: Checker = Checker()
 ) {
 
     fun checkBalanceReport() {
-        printChecks.check(
+        checker.check(
             name = "should return empty transactions when no transactions exist",
-            result = DefaultFinanceTrackerViewer(dataSource).balanceReport(),
+            result = financeTrackerManager.getBalanceReport(),
             expectedResult = TotalTransactions(transactions = emptyList())
         )
-
+        financeTrackerManager.clearTransactions()
         val mockTransactions = listOf(
             Transaction(
                 id = 1,
@@ -44,23 +43,23 @@ class FinanceTrackerViewerChecker (
                 date = Date()
             )
         )
-        mockTransactions.forEach { dataSource.addTransactions(it) }
+        mockTransactions.forEach { financeTrackerManager.addTransaction(it) }
 
-        printChecks.check(
+        checker.check(
             name = "should correctly calculate total expenses from transactions",
-            result = DefaultFinanceTrackerViewer(dataSource).balanceReport(),
+            result = financeTrackerManager.getBalanceReport(),
             expectedResult = TotalTransactions(transactions = mockTransactions)
         )
 
-        printChecks.check(
+        checker.check(
             name = "should correctly calculate total income from transactions",
-            result = DefaultFinanceTrackerViewer(dataSource).balanceReport(),
+            result = financeTrackerManager.getBalanceReport(),
             expectedResult = TotalTransactions(transactions = mockTransactions)
         )
 
-        printChecks.check(
+        checker.check(
             name = "should correctly calculate net balance (income - expenses)",
-            result = DefaultFinanceTrackerViewer(dataSource).balanceReport(),
+            result = financeTrackerManager.getBalanceReport(),
             expectedResult = TotalTransactions(transactions = mockTransactions)
         )
     }

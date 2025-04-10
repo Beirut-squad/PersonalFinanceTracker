@@ -1,65 +1,50 @@
 package core
 
 import datasource.FinanceTrackerDataSource
-import datasource.InMemoryDataSource
-import models.Category
+import models.TotalTransactions
 import models.Transaction
-import models.TransactionType
 import java.util.*
 
 class FinanceTrackerManagerImpl(
-    private val ftDataSource: FinanceTrackerDataSource,
+    private val dataSource: FinanceTrackerDataSource,
     private val validator: FinanceTrackerValidator
 ): FinanceTrackerManager {
     override fun addTransaction(transaction: Transaction): Boolean {
-        if (ftDataSource.transactions.any { it.id == transaction.id }){
-            return false
-        }else if(transaction.id < 0){
-            return false
+        if (!validator.validateTransaction(transaction)) return false
 
-        }else if (transaction.title.trim().isBlank()){
-            return false
-        }else if(transaction.amount <= 0.0){
+        if (dataSource.getTransactions().any { it.id == transaction.id }){
             return false
         }
 
-
-
-        ftDataSource.addTransactions(transaction)
+        dataSource.addTransactions(transaction)
         return true
     }
 
     override fun deleteTransaction(id: Int): Boolean {
-
-        val transactions = ftDataSource.transactions
-
-        if (id < 0) {
+        if (dataSource.getTransactions().isEmpty()) {
             return false
         }
 
-        if (transactions.isEmpty()) {
-            return false
-        }
-
-        val deletedTransaction = transactions.find { id == it.id }
+        val deletedTransaction = dataSource.getTransactions().find { id == it.id }
 
         if (deletedTransaction == null) {
             return false
         }
 
-        return transactions.remove(deletedTransaction)
+        dataSource.deleteTransactions(deletedTransaction)
+        return true
     }
 
-    override fun clearTransactions(): Boolean {
-        return true
+    override fun clearTransactions() {
+        dataSource.clear()
     }
 
     override fun editTransaction(transaction: Transaction): Boolean {
         if (!validator.validateTransaction(transaction)) return false
 
-        for (existingTransaction in ftDataSource.transactions) {
+        for (existingTransaction in dataSource.getTransactions()) {
             if (transaction.id == existingTransaction.id) {
-                ftDataSource.editTransactions(transaction)
+                dataSource.editTransactions(transaction)
                 return true
             }
         }
@@ -67,8 +52,13 @@ class FinanceTrackerManagerImpl(
         return false
     }
 
-    override fun viewMonthlySummery(month: Int, year: Int): List<Transaction> {
-        return ftDataSource.transactions.filter { transaction ->
+    // Viewer
+    override fun getBalanceReport(): TotalTransactions {
+        return TotalTransactions(transactions = dataSource.getTransactions())
+    }
+
+    override fun getMonthlySummery(month: Int, year: Int): List<Transaction> {
+        return dataSource.getTransactions().filter { transaction ->
             val cal = Calendar.getInstance()
             cal.time = transaction.date
             val transactionMonth = cal.get(Calendar.MONTH) + 1
@@ -77,4 +67,5 @@ class FinanceTrackerManagerImpl(
             transactionMonth == month && transactionYear == year
         }
     }
+
 }

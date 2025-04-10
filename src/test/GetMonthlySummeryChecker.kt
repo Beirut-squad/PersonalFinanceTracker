@@ -8,7 +8,7 @@ import java.util.*
 
 class GetMonthlySummeryChecker(
     private val financeTrackerManager: FinanceTrackerManager,
-    private val printChecks: Checker = Checker()
+    private val checker: Checker = Checker()
 ) {
 
     fun runAllMonthlySummaryChecks() {
@@ -51,30 +51,30 @@ class GetMonthlySummeryChecker(
         )
         transactions.add(transaction3)
 
-        val validDate = financeTrackerManager.viewMonthlySummery(3, 2024) // March is month 3
-        val invalidDate = financeTrackerManager.viewMonthlySummery(10, 2026)
-        val invalidMonth = financeTrackerManager.viewMonthlySummery(25, 2026)
-        val invalidYear = financeTrackerManager.viewMonthlySummery(3, 102)
+        val validDate = financeTrackerManager.getMonthlySummery(3, 2024) // March is month 3
+        val invalidDate = financeTrackerManager.getMonthlySummery(10, 2026)
+        val invalidMonth = financeTrackerManager.getMonthlySummery(25, 2026)
+        val invalidYear = financeTrackerManager.getMonthlySummery(3, 102)
 
-        printChecks.check(
+        checker.check(
             name = "Summary should return only March 2024 transactions",
             result = validDate,
             expectedResult = listOf(transaction1, transaction2)
         )
 
-        printChecks.check(
+        checker.check(
             name = "When the date is wrong , should return empty list ",
             result = invalidDate,
             expectedResult = listOf()
         )
 
-        printChecks.check(
+        checker.check(
             name = "When the month is wrong , should return empty list ",
             result = invalidMonth,
             expectedResult = listOf()
         )
 
-        printChecks.check(
+        checker.check(
             name = "When the year is wrong , should return empty list ",
             result = invalidYear,
             expectedResult = listOf()
