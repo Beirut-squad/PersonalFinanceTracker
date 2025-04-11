@@ -1,11 +1,14 @@
 package ui
 
+import Colors
 import core.FinanceTrackerManager
 import models.Category
 import models.Transaction
 import models.TransactionType
+import java.awt.Color
 import java.time.LocalDate
 import java.util.*
+
 
 class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
     private var running = true
@@ -27,7 +30,9 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     running = false
                 }
 
-                else -> println("\u001B[31mInvalid choice.\u001B[0m")
+                else -> {
+                    println(Colors().redColorText("Invalid choice."))
+                }
             }
         }
     }
@@ -51,7 +56,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     break
                 }
 
-                else -> println("\u001B[31mInvalid choice.\u001B[0m")
+                else -> println(Colors().redColorText("Invalid choice."))
             }
         }
     }
@@ -77,10 +82,11 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             )
 
             if (manager.addTransaction(transaction)) {
-                println("\u001B[32mTransaction added\u001B[0m")
+                println(Colors().greenColorText("Transactions Added"))
+                println(Colors().blueStars())
                 break
             } else {
-                println("\u001B[31mplease try again , there is an error in the data\u001B[0m")
+                println(Colors().redColorText("please try again , there is an error in the data"))
             }
         }
 
@@ -93,7 +99,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             when (readlnOrNull()?.toIntOrNull()) {
                 1 -> return TransactionType.INCOME
                 2 -> return TransactionType.EXPENSE
-                else -> println("\u001B[31mInvalid input. Please enter 1 or 2.\u001B[0m")
+                else -> println(Colors().redColorText("Invalid input. Please enter 1 or 2."))
             }
         }
     }
@@ -108,7 +114,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             print("- Choose an option (a number from 1 to ${Category.entries.size}): ")
             when (val choice = readlnOrNull()?.toIntOrNull()) {
                 in 1..Category.entries.size -> return Category.entries[(choice ?: 1) - 1]
-                else -> println("\u001B[31mInvalid input. Please enter a number between 1 and ${Category.entries.size}.\u001B[0m")
+                else -> println(Colors().redColorText("Invalid input. Please enter a number between 1 and ${Category.entries.size}."))
             }
         }
     }
@@ -184,14 +190,18 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     }
 
                     if (manager.editTransaction(currentTransaction)) {
-                        println("\u001B[32mTransaction edited\u001B[0m")
+                        println(Colors().greenColorText("Transaction edited"))
+                        println(Colors().blueStars())
                         break
                     } else {
-                        println("\u001B[31mPlease try again, there is an error in the data\u001B[0m")
+                        println(Colors().redColorText("please try again , there is an error in the data"))
+                        println(Colors().blueStars())
                     }
                 }
 
-                else -> println("\u001B[31mInvalid input. Please enter a number between 1 and ${transactions.size}.\u001B[0m")
+                else -> {
+                    println(Colors().redColorText("Invalid input. Please enter a number between 1 and ${transactions.size}."))
+                }
             }
         }
     }
@@ -209,12 +219,13 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     println("Delete your transaction")
                     val currentTransactionID = transactions[(choice ?: 1) - 1].id
                     if (manager.deleteTransaction(currentTransactionID)) {
-                        println("\u001B[32mTransaction deleted\u001B[0m")
+                        println(Colors().greenColorText("Transaction deleted"))
+                        println(Colors().blueStars())
                         break
                     }
                 }
 
-                else -> println("\u001B[31mInvalid input. Please enter a number between 1 and ${transactions.size}.\u001B[0m")
+                else -> println(Colors().redColorText("Invalid input. Please enter a number between 1 and ${transactions.size}."))
             }
         }
     }
@@ -224,25 +235,21 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
     ): List<Transaction> {
 
         if (transactions.isEmpty()) {
-            println("\t\u001B[31mYou don't have any transactions.\u001B[0m")
+            println(Colors().redColorText("You don't have any transactions."))
             return emptyList()
         }
-
-        print("\u001B[32m")
 
         for (transactionInd in 1..transactions.size) {
             val transaction = transactions[transactionInd - 1]
 
             println(
-                "\t\t${transactionInd}: title: ${transaction.title}, amount: ${transaction.amount}, type: ${
+                Colors().purpleColorText("\t${transactionInd}: title: ${transaction.title}, amount: ${transaction.amount}, type: ${
                     transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }
                 }, category: ${
                     transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }
                 }, date: ${transaction.date}"
-            )
+            ))
         }
-
-        print("\u001B[0m")
 
         return transactions
     }
@@ -261,18 +268,21 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     println("The month or year will come later.")
                 }else{
                     if (summary.isNotEmpty()){
-                        print("\u001B[32m")
                         for (transactionInd in 1..summary.size) {
                             val transaction = summary[transactionInd - 1]
-                            println("\t\t${transactionInd}: title: ${transaction.title}, amount: ${transaction.amount}, type: ${transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }}, category: ${transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }}, date: ${transaction.date}")
+                            println(Colors().purpleColorText("${transactionInd}-> Title: ${transaction.title}, Amount: ${transaction.amount}, Type: ${
+                                transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }
+                            }, Category: ${
+                                transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }
+                            }, Date: ${transaction.date}"))
                         }
-                        print("\u001B[0m")
+                        println(Colors().blueStars())
                     }else
-                        println("You have no any transactions in this month")
+                        println(Colors().redColorText("You have no any transactions in this month"))
                 }
-            }else println("Invalid Year")
+            }else println(Colors().redColorText("Invalid Year"))
         }
-        else println("Invalid month")
+        else println(Colors().redColorText("Invalid month"))
     }
 
     private fun viewBalanceReport() {
@@ -284,12 +294,9 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             }
             break
         }
-        println("\tShow Total Balance report ")
-        println("\tBalance report is: ${totalTransactions.totalBalance},\tIncome Balance report is: ${totalTransactions.incomeBalance},\tExpenses Balance report is: ${totalTransactions.expensesBalance}")
-
-
-
-
+        println(Colors().greenColorText("Show Total Balance report "))
+        println(Colors().greenColorText("Balance report is: ${totalTransactions.totalBalance}\nIncome Balance report is: ${totalTransactions.incomeBalance}\nExpenses Balance report is: ${totalTransactions.expensesBalance}"))
+        println(Colors().blueStars())
     }
 
     fun checkMonth(month:Int): Boolean{
