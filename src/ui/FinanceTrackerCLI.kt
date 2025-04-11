@@ -196,11 +196,15 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager)
              return emptyList()
          }
 
+         print("\u001B[32m")
+
          for (transactionInd in 1..transactions.size) {
              val transaction = transactions[transactionInd - 1]
 
              println("\t\t${transactionInd}: title: ${transaction.title}, amount: ${transaction.amount}, type: ${transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }}, category: ${transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }}")
          }
+
+         print("\u001B[0m")
 
          return transactions
      }
