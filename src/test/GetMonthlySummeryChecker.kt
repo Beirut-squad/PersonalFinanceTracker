@@ -12,7 +12,6 @@ class GetMonthlySummeryChecker(
 ) {
 
     fun runAllMonthlySummaryChecks() {
-        val transactions : MutableList<Transaction> = mutableListOf()
         val calendar = Calendar.getInstance()
 
         // Transaction in March 2024
@@ -25,7 +24,6 @@ class GetMonthlySummeryChecker(
             category = Category.FOOD,
             date = calendar.time
         )
-        transactions.add(transaction1)
 
         // Transaction in March 2024
         calendar.set(2024, Calendar.MARCH, 15)
@@ -37,7 +35,7 @@ class GetMonthlySummeryChecker(
             category = Category.SALARY,
             date = calendar.time
         )
-        transactions.add(transaction2)
+
 
         // Transaction in April 2024
         calendar.set(2024, Calendar.APRIL, 10)
@@ -49,7 +47,10 @@ class GetMonthlySummeryChecker(
             category = Category.FOOD,
             date = calendar.time
         )
-        transactions.add(transaction3)
+
+        financeTrackerManager.addTransaction(transaction1)
+        financeTrackerManager.addTransaction(transaction2)
+        financeTrackerManager.addTransaction(transaction3)
 
         val validDate = financeTrackerManager.getMonthlySummery(3, 2024) // March is month 3
         val invalidDate = financeTrackerManager.getMonthlySummery(10, 2026)
