@@ -1,18 +1,29 @@
 package datasource
 
+import datasource.utils.CsvParser
 import models.Category
 import models.Transaction
 import models.TransactionType
+import utils.dateToString
+import utils.stringToDate
 import java.io.File
+import java.io.IOException
 import java.util.*
 
-class FilesDataSource : FinanceTrackerDataSource {
+class CsvDataSource(
+    private val csvParser: CsvParser
+) : FinanceTrackerDataSource {
     override fun addTransactions(transaction: Transaction) {
-        if (!File(FILE_NAME).exists()) {
-            writeCsvBasic(FILE_NAME, listOf(parseTransactionToCsv(transaction)))
-        } else {
-            appendCsvBasic(FILE_NAME, listOf(parseTransactionToCsv(transaction)))
+        val file = getCsv()
+        csvParser.appendCsv(file, listOf(parseTransactionToCsv(transaction)))
+    }
+
+    private fun getCsv(): File {
+        val file = File(FILE_NAME)
+        if (file.exists()) {
+            return file
         }
+        throw IOException("Unable to access file")
     }
 
     override fun editTransactions(transaction: Transaction) {
@@ -21,7 +32,8 @@ class FilesDataSource : FinanceTrackerDataSource {
     }
 
     override fun getTransactions(): List<Transaction> {
-        val csvEntries = readCsvBasic(FILE_NAME)
+        val file = getCsv()
+        val csvEntries = csvParser.readCsv(file)
         val allTransactions = mutableListOf<Transaction>()
 
         for (entry in csvEntries) {
@@ -32,20 +44,21 @@ class FilesDataSource : FinanceTrackerDataSource {
     }
 
     override fun deleteTransactions(transaction: Transaction) {
-        val allData = readCsvBasic(FILE_NAME)
+        val file = getCsv()
+        val allData = csvParser.readCsv(file)
         val transactions = allData.map { parseCsvTransaction(it) }
 
         for (currentTransactionInd in 1..transactions.size) {
             val currentTransaction = transactions[currentTransactionInd - 1]
             if (currentTransaction.id == transaction.id) {
-                deleteLineByNumber(FILE_NAME, currentTransactionInd)
+                csvParser.deleteLineByNumber(file, currentTransactionInd)
                 break
             }
         }
     }
 
     override fun clear() {
-        deleteEntireFile(FILE_NAME)
+        csvParser.deleteEntireFile(getCsv())
     }
 
     private fun parseTransactionToCsv(transaction: Transaction): List<String> {
