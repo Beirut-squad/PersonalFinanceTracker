@@ -4,6 +4,7 @@ import core.FinanceTrackerManager
 import models.Category
 import models.Transaction
 import models.TransactionType
+import java.util.*
 
 class FinanceTrackerCLI(private val manager: FinanceTrackerManager)
  {
@@ -125,50 +126,55 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager)
                      var currentTransaction = transactions[(choice?: 1) - 1]
 
                      // Title
-                     println("Do you want to change the title? (y, n)")
+                     print("Do you want to change the title? (Enter y if you want or anything else to skip): ")
                      var check = readlnOrNull()
 
-                     if ((check?.lowercase()?.single() ?: 'n') == 'y') {
+                     if ((check?.lowercase()?.first() ?: 'n') == 'y') {
                          print("\tEnter title: ")
                          val title = readlnOrNull()?.trim()
                          currentTransaction = currentTransaction.copy(
-                             title = title ?: ""
+                             title = title ?: "",
+                             date = Date()
                          )
+                     } else {
+
                      }
 
                      // Amount
-                     println("Do you want to change the amount? (y, n)")
+                     print("Do you want to change the amount? (Enter y if you want or anything else to skip): ")
                      check = readlnOrNull()
 
-                     if ((check?.lowercase()?.single() ?: 'n') == 'y') {
+                     if ((check?.lowercase()?.first() ?: 'n') == 'y') {
                          print("\tEnter amount: ")
                          val amount = readlnOrNull()?.toDoubleOrNull()
                          currentTransaction = currentTransaction.copy(
-                             amount = amount ?: 0.0
+                             amount = amount ?: 0.0,
+                             date = Date()
                          )
                      }
 
 
                      // Type
-                     println("Do you want to change the type? (y, n)")
+                     print("Do you want to change the type? (Enter y if you want or anything else to skip): ")
                      check = readlnOrNull()
 
-                     if ((check?.lowercase()?.single() ?: 'n') == 'y') {
-                         print("\tEnter type: ")
+                     if ((check?.lowercase()?.first() ?: 'n') == 'y') {
                          val type = getValidTransactionType()
                          currentTransaction = currentTransaction.copy(
-                             transactionType = type
+                             transactionType = type,
+                             date = Date()
                          )
                      }
 
                      // Category
-                     println("Do you want to change the category? (y, n)")
+                     print("Do you want to change the category? (Enter y if you want or anything else to skip): ")
                      check = readlnOrNull()
 
-                     if ((check?.lowercase()?.single() ?: 'n') == 'y') {
+                     if ((check?.lowercase()?.first() ?: 'n') == 'y') {
                          val category = getValidCategory()
                          currentTransaction = currentTransaction.copy(
-                             category = category
+                             category = category,
+                             date = Date()
                          )
                      }
 
@@ -185,7 +191,25 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager)
      }
 
      private fun deleteTransaction() {
-         // TODO
+         while (true) {
+             val transactions = viewTransactions()
+             if (transactions.isEmpty()) {
+                 break
+             }
+             println("\tChoose the transaction you want to delete")
+             print("- Choose an option (a number from 1 to ${transactions.size}): ")
+             when (val choice = readlnOrNull()?.toIntOrNull()) {
+                 in 1..transactions.size -> {
+                     println("Delete your transaction")
+                     val currentTransactionID = transactions[(choice?: 1) - 1].id
+                     if (manager.deleteTransaction(currentTransactionID)) {
+                         println("\u001B[32mTransaction deleted\u001B[0m")
+                         break
+                     }
+                 }
+                 else -> println("\u001B[31mInvalid input. Please enter a number between 1 and ${transactions.size}.\u001B[0m")
+             }
+         }
      }
 
      private fun viewTransactions(): List<Transaction> {
@@ -201,7 +225,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager)
          for (transactionInd in 1..transactions.size) {
              val transaction = transactions[transactionInd - 1]
 
-             println("\t\t${transactionInd}: title: ${transaction.title}, amount: ${transaction.amount}, type: ${transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }}, category: ${transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }}")
+             println("\t\t${transactionInd}: title: ${transaction.title}, amount: ${transaction.amount}, type: ${transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }}, category: ${transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }}, date: ${transaction.date}")
          }
 
          print("\u001B[0m")
