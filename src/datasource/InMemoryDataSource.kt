@@ -15,6 +15,7 @@ class InMemoryDataSource : FinanceTrackerDataSource {
             if (exitingTransaction.id == transaction.id){
                 transactions.remove(exitingTransaction)
                 transactions.add(transaction)
+                break
             }
         }
     }
