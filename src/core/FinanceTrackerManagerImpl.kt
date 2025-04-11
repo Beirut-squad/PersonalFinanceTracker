@@ -52,6 +52,10 @@ class FinanceTrackerManagerImpl(
         return false
     }
 
+    override fun getTransactions(): List<Transaction> {
+        return dataSource.getTransactions()
+    }
+
     // Viewer
     override fun getBalanceReport(): TotalTransactions {
         return TotalTransactions(transactions = dataSource.getTransactions())
