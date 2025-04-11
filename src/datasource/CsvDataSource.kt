@@ -20,10 +20,10 @@ class CsvDataSource(
 
     private fun getCsv(): File {
         val file = File(FILE_NAME)
-        if (file.exists()) {
-            return file
+        if (!file.exists()) {
+            file.createNewFile() // Creates the file if it does not exist
         }
-        throw IOException("Unable to access file")
+        return file
     }
 
     override fun editTransactions(transaction: Transaction) {
