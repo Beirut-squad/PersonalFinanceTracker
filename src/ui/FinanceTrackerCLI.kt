@@ -278,8 +278,8 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             }
             break
         }
-        println("\t Show Total Balance report ")
-        println("\t\tBalance report is: ${totalTransactions.totalBalance},\t\t Income Balance report is: ${totalTransactions.incomeBalance},\t\t Expenses Balance report is: ${totalTransactions.expensesBalance}\"")
+        println("\tShow Total Balance report ")
+        println("\tBalance report is: ${totalTransactions.totalBalance},\tIncome Balance report is: ${totalTransactions.incomeBalance},\tExpenses Balance report is: ${totalTransactions.expensesBalance}")
 
 
 
