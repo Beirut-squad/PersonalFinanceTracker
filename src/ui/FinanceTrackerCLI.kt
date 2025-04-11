@@ -4,7 +4,7 @@ import core.FinanceTrackerManager
 import models.Category
 import models.Transaction
 import models.TransactionType
-import java.time.Month
+import java.time.LocalDate
 import java.util.*
 
 class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
@@ -185,7 +185,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     }
                 }
 
-                else -> println("\u001B[31mInvalid input. Please enter a number between 1 and ${Category.entries.size}.\u001B[0m")
+                else -> println("\u001B[31mInvalid input. Please enter a number between 1 and ${transactions.size}.\u001B[0m")
             }
         }
     }
@@ -242,7 +242,31 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
     }
 
     private fun viewMonthlySummary() {
-        // TODO
+        println("Enter the Month that you want to view summary: 1-12")
+        val month = readlnOrNull().toString().toIntOrNull() ?: 0
+
+        if (month != 0 && checkMonth(month)){
+            println("Enter the Year that you want to view summary:")
+            val year = readlnOrNull().toString().toIntOrNull() ?: 0
+
+            if (year != 0 && year.toString().length == 4){
+                val summary = manager.getMonthlySummery(month,year)
+                if (month > (LocalDate.now().month.value) || year > LocalDate.now().year){
+                    println("The month or year will come later.")
+                }else{
+                    if (summary.isNotEmpty()){
+                        print("\u001B[32m")
+                        for (transactionInd in 1..summary.size) {
+                            val transaction = summary[transactionInd - 1]
+                            println("\t\t${transactionInd}: title: ${transaction.title}, amount: ${transaction.amount}, type: ${transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }}, category: ${transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }}, date: ${transaction.date}")
+                        }
+                        print("\u001B[0m")
+                    }else
+                        println("You have no any transactions in this month")
+                }
+            }else println("Invalid Year")
+        }
+        else println("Invalid month")
     }
 
     private fun viewBalanceReport() {
@@ -254,12 +278,16 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             }
             break
         }
-        println("\t Show Total Balance report ")
-        println("\t\tBalance report is: ${totalTransactions.totalBalance},\t\t Income Balance report is: ${totalTransactions.incomeBalance},\t\t Expenses Balance report is: ${totalTransactions.expensesBalance}\"")
+        println("\tShow Total Balance report ")
+        println("\tBalance report is: ${totalTransactions.totalBalance},\tIncome Balance report is: ${totalTransactions.incomeBalance},\tExpenses Balance report is: ${totalTransactions.expensesBalance}")
 
 
 
 
+    }
+
+    fun checkMonth(month:Int): Boolean{
+        return month in 1..12
     }
 
 }

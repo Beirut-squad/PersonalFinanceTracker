@@ -36,15 +36,16 @@ class BalanceReportChecker (
                 date = Date()
             ), Transaction(
                 id = 3,
-                title = " ",
+                title = "buy T-shirt ",
                 amount = 100.0,
                 transactionType = TransactionType.EXPENSE,
                 category = Category.SHOPPING,
                 date = Date()
             )
         )
-        mockTransactions.forEach { financeTrackerManager.addTransaction(it) }
-
+        mockTransactions.forEach {
+            if (!financeTrackerManager.addTransaction(it)) println("Failed to add transaction: $it")
+        }
         checker.check(
             name = "should correctly calculate total expenses from transactions",
             result = financeTrackerManager.getBalanceReport(),
