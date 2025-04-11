@@ -185,7 +185,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     }
                 }
 
-                else -> println("\u001B[31mInvalid input. Please enter a number between 1 and ${Category.entries.size}.\u001B[0m")
+                else -> println("\u001B[31mInvalid input. Please enter a number between 1 and ${transactions.size}.\u001B[0m")
             }
         }
     }
