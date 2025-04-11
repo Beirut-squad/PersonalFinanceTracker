@@ -128,36 +128,42 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
 
                     // Title
                     print("Do you want to change the title? (Enter y if you want or anything else to skip): ")
-                    var check = readlnOrNull()
+                    var check = readlnOrNull()?.trim()
 
-                    if ((check?.lowercase()?.first() ?: 'n') == 'y') {
+                    // Simplified condition - only proceed if input is exactly "y" or "Y"
+                    if (check.equals("y", ignoreCase = true)) {
                         print("\tEnter title: ")
-                        val title = readlnOrNull()?.trim()
+                        val title = readlnOrNull()?.trim()?.takeIf { it.isNotEmpty() } ?: run {
+                            println("\u001B[31mTitle cannot be empty. Keeping previous title.\u001B[0m")
+                            currentTransaction.title
+                        }
                         currentTransaction = currentTransaction.copy(
-                            title = title ?: "",
+                            title = title,
                             date = Date()
                         )
                     }
 
                     // Amount
                     print("Do you want to change the amount? (Enter y if you want or anything else to skip): ")
-                    check = readlnOrNull()
+                    check = readlnOrNull()?.trim()
 
-                    if ((check?.lowercase()?.first() ?: 'n') == 'y') {
+                    if (check.equals("y", ignoreCase = true)) {
                         print("\tEnter amount: ")
-                        val amount = readlnOrNull()?.toDoubleOrNull()
+                        val amount = readlnOrNull()?.toDoubleOrNull() ?: run {
+                            println("\u001B[31mInvalid amount. Keeping previous amount.\u001B[0m")
+                            currentTransaction.amount
+                        }
                         currentTransaction = currentTransaction.copy(
-                            amount = amount ?: 0.0,
+                            amount = amount,
                             date = Date()
                         )
                     }
 
-
                     // Type
                     print("Do you want to change the type? (Enter y if you want or anything else to skip): ")
-                    check = readlnOrNull()
+                    check = readlnOrNull()?.trim()
 
-                    if ((check?.lowercase()?.first() ?: 'n') == 'y') {
+                    if (check.equals("y", ignoreCase = true)) {
                         val type = getValidTransactionType()
                         currentTransaction = currentTransaction.copy(
                             transactionType = type,
@@ -167,9 +173,9 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
 
                     // Category
                     print("Do you want to change the category? (Enter y if you want or anything else to skip): ")
-                    check = readlnOrNull()
+                    check = readlnOrNull()?.trim()
 
-                    if ((check?.lowercase()?.first() ?: 'n') == 'y') {
+                    if (check.equals("y", ignoreCase = true)) {
                         val category = getValidCategory()
                         currentTransaction = currentTransaction.copy(
                             category = category,
@@ -181,7 +187,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                         println("\u001B[32mTransaction edited\u001B[0m")
                         break
                     } else {
-                        println("\u001B[31mplease try again , there is an error in the data\u001B[0m")
+                        println("\u001B[31mPlease try again, there is an error in the data\u001B[0m")
                     }
                 }
 
