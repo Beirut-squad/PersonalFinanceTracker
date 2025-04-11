@@ -286,7 +286,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
 
     }
 
-    fun checkMonth(month:Any): Boolean{
+    fun checkMonth(month:Int): Boolean{
         return month in 1..12
     }
 
