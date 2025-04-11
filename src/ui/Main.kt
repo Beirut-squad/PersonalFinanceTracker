@@ -1,5 +1,14 @@
 package ui
 
+import core.FinanceTrackerManagerImpl
+import core.FinanceTrackerValidator
+import core.FinanceTrackerValidatorImp
+import datasource.InMemoryDataSource
+
 fun main() {
-    println("Hello, World!")
+    val dataSource = InMemoryDataSource()
+    val validator: FinanceTrackerValidator = FinanceTrackerValidatorImp()
+    val manager = FinanceTrackerManagerImpl(dataSource,validator)
+    val cli = FinanceTrackerCLI(manager)
+    cli.run()
 }
