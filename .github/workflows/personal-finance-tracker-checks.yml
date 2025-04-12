@@ -33,6 +33,7 @@ jobs:
           
           import core.*
           import datasource.*
+          import test.*
           
           # Create temporary Kotlin file with test runner
           cat << 'EOF' > RunValidations.kt
