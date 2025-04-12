@@ -82,16 +82,18 @@ jobs:
                   try {
                       dataSource.clear()
                       test()
+                      println("::notice::✓ $name")
                       output.add("✓ $name")
                   } catch (e: Exception) {
                       allSuccess = false
+                      println("::error::✗ $name - ${e.message ?: "Test failed"}")
                       output.add("✗ $name - ${e.message ?: "Test failed"}")
                   }
               }
 
-              println("RESULTS<<EOF")
-              println(output.joinToString("\n"))
-              println("EOF")
+              // Set outputs
+              println("::set-output name=results::${output.joinToString("%0A")}")
+              println("::set-output name=success::$allSuccess")
 
               if (!allSuccess) {
                   throw Exception("Some validations failed")
@@ -104,11 +106,10 @@ jobs:
 
           echo "Running validations..."kotlin -classpath RunValidations.jar ValidationRunnerKt
 
-      - name: Show results in PR
+      - name: Create summary
         if: always()
         run: |
-          echo "Validation results:"
-          echo "$RESULTS"
-          echo "success=${{ steps.run-validations.outputs.success }}"
-        env:
-          RESULTS: ${{ steps.run-validations.outputs.results }}
+          echo "### Validation Results" >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.run-validations.outputs.results }}" | sed 's/%0A/\n/g' >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Overall Status:** ${{ steps.run-validations.outputs.success == 'true' && '✅ All checks passed' || '❌ Some checks failed' }}" >> $GITHUB_STEP_SUMMARY
