@@ -1,14 +1,13 @@
 class Colors {
-    fun redColorText(text: String): String {
+    fun printRedColorText(text: String) {
         val redColor = "\u001B[31m"
         val resetColor = "\u001B[0m"
-        return "$redColor$text$resetColor"
+         println("$redColor$text$resetColor")
     }
-
-    fun greenColorText(text: String): String {
+    fun printGreenColorText(text: String) {
         val greenColor = "\u001B[32m"
         val resetColor = "\u001B[0m"
-        return "$greenColor$text$resetColor"
+        println("$greenColor$text$resetColor")
     }
 
     fun blueStars(): String {
@@ -16,10 +15,11 @@ class Colors {
         val reset = "\u001B[0m"
         return "$blue****************************************************************$reset"
     }
-    fun purpleColorText(text: String): String {
+
+    fun printPurpleColorText(text: String)  {
         val purple = "\u001B[35m"
         val reset = "\u001B[0m"
-        return "$purple$text$reset"
+        println("$purple$text$reset")
     }
 
 

@@ -8,10 +8,10 @@ import java.util.*
 
 class GetMonthlySummeryChecker(
     private val financeTrackerManager: FinanceTrackerManager,
-    private val checker: Checker = Checker()
+    private val checker: Checker
 ) {
 
-    fun runAllMonthlySummaryChecks() {
+    fun runMonthlySummaryChecks() {
         val calendar = Calendar.getInstance()
 
         // Transaction in March 2024
