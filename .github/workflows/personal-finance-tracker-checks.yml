@@ -2,11 +2,10 @@ name: Finance Tracker Validation
 
 on:
   pull_request:
-    branches: [ develop ]  # Changed from main to develop
+    branches: [ develop ]
   push:
-    branches: [ develop ]  # Optional: also run on direct pushes to develop
+    branches: [ develop ]
 
-# Required permissions to create check runs
 permissions:
   checks: write
   contents: read
@@ -30,13 +29,27 @@ jobs:
       - name: Run validations
         id: run-validations
         run: |
-          
           # Find all Kotlin source files from all relevant source directories
-          KOTLIN_SOURCES=$(find src/core src/datasource src/test src/models -name "*.kt" | tr '\n' ' ')
+          KOTLIN_SOURCES=$(find src -name "*.kt" | tr '\n' ' ')
           
-          import core.*
-          import datasource.*
-          import test.*
+          # Create test runner file
+          cat << 'EOF' > RunValidations.kt
+          @file:JvmName("ValidationRunner")
+          
+          package validation
+          
+          // Import all required classes
+          import core.FinanceTrackerManager
+          import core.FinanceTrackerManagerImpl
+          import datasource.FinanceTrackerDataSource
+          import datasource.InMemoryDataSource
+          import core.FinanceTrackerValidator
+          import core.FinanceTrackerValidatorImp
+          import test.AddTransactionChecker
+          import test.DeleteTransactionChecker
+          import test.EditTransactionChecker
+          import test.BalanceReportChecker
+          import test.GetMonthlySummeryChecker
           import models.*
           
           fun main() {
@@ -44,7 +57,7 @@ jobs:
               val validator: FinanceTrackerValidator = FinanceTrackerValidatorImp()
               val financeTrackerManager: FinanceTrackerManager = FinanceTrackerManagerImpl(dataSource, validator)
 
-              val results = listOf(
+              val results = listOf<Pair<String, () -> Unit>>(
                   Pair("Add Transaction") { 
                       AddTransactionChecker(financeTrackerManager).runAddTests() 
                   },
@@ -89,8 +102,11 @@ jobs:
           }
           EOF
           
-          # Compile and run
-          kotlinc RunValidations.kt -include-runtime -d RunValidations.jar
+          # Compile all sources together
+          echo "Compiling Kotlin files..."
+          kotlinc $KOTLIN_SOURCES RunValidations.kt -include-runtime -d RunValidations.jar
+          
+          echo "Running validations..."
           java -jar RunValidations.jar
 
       - name: Create check run
@@ -119,7 +135,6 @@ jobs:
               })
             } catch (error) {
               core.error('Failed to create check run: ' + error.message)
-              // Fallback to job summary
               await core.summary
                 .addHeading('Validation Results')
                 .addRaw(process.env.RESULTS.replace(/%0A/g, '\n'))
