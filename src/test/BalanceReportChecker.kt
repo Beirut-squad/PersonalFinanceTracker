@@ -9,10 +9,10 @@ import java.util.Date
 
 class BalanceReportChecker (
     private val financeTrackerManager: FinanceTrackerManager,
-    private val checker: Checker = Checker()
+    private val checker: Checker
 ) {
 
-    fun checkBalanceReport() {
+    fun runBalanceReportChecks() {
         checker.check(
             name = "should return empty transactions when no transactions exist",
             result = financeTrackerManager.getBalanceReport(),

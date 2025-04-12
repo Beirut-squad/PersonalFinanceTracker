@@ -8,10 +8,10 @@ import java.util.*
 
 class AddTransactionChecker(
     private val financeTrackerManager: FinanceTrackerManager,
-    private val checker: Checker = Checker()
+    private val checker: Checker
 ) {
 
-    fun runAddTests() {
+    fun runAddChecks() {
         financeTrackerManager.clearTransactions()
         var transaction = Transaction(
             id = 0,

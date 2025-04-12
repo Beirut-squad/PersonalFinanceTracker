@@ -7,9 +7,9 @@ import models.TransactionType
 import java.util.*
 class DeleteTransactionChecker (
     private val financeTrackerManager: FinanceTrackerManager,
-    private val checker: Checker = Checker()
+    private val checker: Checker
 ) {
-    fun runAllDeleteChecker() {
+    fun runDeleteChecks() {
         financeTrackerManager.clearTransactions()
         val value1 = Transaction(
             id = 0,

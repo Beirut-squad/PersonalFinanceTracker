@@ -5,13 +5,14 @@ import core.FinanceTrackerManager
 import models.Category
 import models.Transaction
 import models.TransactionType
-import java.awt.Color
 import java.time.LocalDate
 import java.util.*
 
 
 class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
     private var running = true
+    var check:String? = null
+
     fun run() {
         while (running) {
             println("Finance Tracker")
@@ -31,7 +32,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                 }
 
                 else -> {
-                    println(Colors().redColorText("Invalid choice."))
+                    println(Colors().changeColorTextToRed("Invalid choice."))
                 }
             }
         }
@@ -56,7 +57,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     break
                 }
 
-                else -> println(Colors().redColorText("Invalid choice."))
+                else -> println(Colors().changeColorTextToRed("Invalid choice."))
             }
         }
     }
@@ -82,11 +83,11 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             )
 
             if (manager.addTransaction(transaction)) {
-                println(Colors().greenColorText("Transactions Added"))
+                println(Colors().changeColorTextToGreen("Transactions Added"))
                 println(Colors().blueStars())
                 break
             } else {
-                println(Colors().redColorText("please try again , there is an error in the data"))
+                println(Colors().changeColorTextToRed("please try again , there is an error in the data"))
             }
         }
 
@@ -99,7 +100,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             when (readlnOrNull()?.toIntOrNull()) {
                 1 -> return TransactionType.INCOME
                 2 -> return TransactionType.EXPENSE
-                else -> println(Colors().redColorText("Invalid input. Please enter 1 or 2."))
+                else -> println(Colors().changeColorTextToRed("Invalid input. Please enter 1 or 2."))
             }
         }
     }
@@ -114,17 +115,18 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             print("- Choose an option (a number from 1 to ${Category.entries.size}): ")
             when (val choice = readlnOrNull()?.toIntOrNull()) {
                 in 1..Category.entries.size -> return Category.entries[(choice ?: 1) - 1]
-                else -> println(Colors().redColorText("Invalid input. Please enter a number between 1 and ${Category.entries.size}."))
+                else -> println(Colors().changeColorTextToRed("Invalid input. Please enter a number between 1 and ${Category.entries.size}."))
             }
         }
     }
 
     private fun editTransaction() {
+        val transactions = manager.getTransactions()
         while (true) {
-            val transactions = viewTransactions()
             if (transactions.isEmpty()) {
                 break
             }
+            viewTransactions(transactions)
             println("\tChoose the transaction you want to edit")
             print("- Choose an option (a number from 1 to ${transactions.size}): ")
             when (val choice = readlnOrNull()?.toIntOrNull()) {
@@ -132,75 +134,32 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     println("Edit your transaction")
                     var currentTransaction = transactions[(choice ?: 1) - 1]
 
-                    // Title
-                    print("Do you want to change the title? (Enter y if you want or anything else to skip): ")
-                    var check = readlnOrNull()?.trim()
+                    // edit title
+                    currentTransaction = editTransactionTitle(currentTransaction)
 
-                    // Simplified condition - only proceed if input is exactly "y" or "Y"
-                    if (check.equals("y", ignoreCase = true)) {
-                        print("\tEnter title: ")
-                        val title = readlnOrNull()?.trim()?.takeIf { it.isNotEmpty() } ?: run {
-                            println("\u001B[31mTitle cannot be empty. Keeping previous title.\u001B[0m")
-                            currentTransaction.title
-                        }
-                        currentTransaction = currentTransaction.copy(
-                            title = title,
-                            date = Date()
-                        )
-                    }
+                    // edit amount
+                    currentTransaction = editTransactionAmount(currentTransaction)
 
-                    // Amount
-                    print("Do you want to change the amount? (Enter y if you want or anything else to skip): ")
-                    check = readlnOrNull()?.trim()
+                    // edit type
+                    currentTransaction = editTransactionType(currentTransaction)
 
-                    if (check.equals("y", ignoreCase = true)) {
-                        print("\tEnter amount: ")
-                        val amount = readlnOrNull()?.toDoubleOrNull() ?: run {
-                            println("\u001B[31mInvalid amount. Keeping previous amount.\u001B[0m")
-                            currentTransaction.amount
-                        }
-                        currentTransaction = currentTransaction.copy(
-                            amount = amount,
-                            date = Date()
-                        )
-                    }
-
-                    // Type
-                    print("Do you want to change the type? (Enter y if you want or anything else to skip): ")
-                    check = readlnOrNull()?.trim()
-
-                    if (check.equals("y", ignoreCase = true)) {
-                        val type = getValidTransactionType()
-                        currentTransaction = currentTransaction.copy(
-                            transactionType = type,
-                            date = Date()
-                        )
-                    }
-
-                    // Category
-                    print("Do you want to change the category? (Enter y if you want or anything else to skip): ")
-                    check = readlnOrNull()?.trim()
-
-                    if (check.equals("y", ignoreCase = true)) {
-                        val category = getValidCategory()
-                        currentTransaction = currentTransaction.copy(
-                            category = category,
-                            date = Date()
-                        )
-                    }
+                    // edit category
+                    currentTransaction = editTransactionCategory(currentTransaction)
 
                     if (manager.editTransaction(currentTransaction)) {
-                        println(Colors().greenColorText("Transaction edited"))
+                        println(Colors().changeColorTextToGreen("Transaction edited"))
                         println(Colors().blueStars())
                         break
                     } else {
-                        println(Colors().redColorText("please try again , there is an error in the data"))
+                        println(Colors().changeColorTextToRed("please try again , there is " +
+                                "an error in the data"))
                         println(Colors().blueStars())
                     }
                 }
 
                 else -> {
-                    println(Colors().redColorText("Invalid input. Please enter a number between 1 and ${transactions.size}."))
+                    println(Colors().changeColorTextToRed("Invalid input. Please enter a number " +
+                            "between 1 and ${transactions.size}."))
                 }
             }
         }
@@ -208,10 +167,11 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
 
     private fun deleteTransaction() {
         while (true) {
-            val transactions = viewTransactions()
+            val transactions = manager.getTransactions()
             if (transactions.isEmpty()) {
                 break
             }
+            viewTransactions(transactions)
             println("\tChoose the transaction you want to delete")
             print("- Choose an option (a number from 1 to ${transactions.size}): ")
             when (val choice = readlnOrNull()?.toIntOrNull()) {
@@ -219,39 +179,37 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     println("Delete your transaction")
                     val currentTransactionID = transactions[(choice ?: 1) - 1].id
                     if (manager.deleteTransaction(currentTransactionID)) {
-                        println(Colors().greenColorText("Transaction deleted"))
+                        println(Colors().changeColorTextToGreen("Transaction deleted"))
                         println(Colors().blueStars())
                         break
                     }
                 }
 
-                else -> println(Colors().redColorText("Invalid input. Please enter a number between 1 and ${transactions.size}."))
+                else -> println(Colors().changeColorTextToRed("Invalid input. Please enter a number between 1 and ${transactions.size}."))
             }
         }
     }
 
     private fun viewTransactions(
         transactions: List<Transaction> = manager.getTransactions()
-    ): List<Transaction> {
+    ) {
 
         if (transactions.isEmpty()) {
-            println(Colors().redColorText("You don't have any transactions."))
-            return emptyList()
+            println(Colors().changeColorTextToRed("You don't have any transactions."))
         }
 
         for (transactionInd in 1..transactions.size) {
             val transaction = transactions[transactionInd - 1]
 
             println(
-                Colors().purpleColorText("\t${transactionInd}: title: ${transaction.title}, amount: ${transaction.amount}, type: ${
+                Colors().changeColorTextToPurple("\t${transactionInd}: title: ${transaction.title}" +
+                        ", amount: ${transaction.amount}, type: ${
                     transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }
                 }, category: ${
                     transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }
                 }, date: ${transaction.date}"
             ))
         }
-
-        return transactions
     }
 
     private fun viewMonthlySummary() {
@@ -267,40 +225,109 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                 if (month > (LocalDate.now().month.value) || year > LocalDate.now().year){
                     println("The month or year will come later.")
                 }else{
-                    if (summary.isNotEmpty()){
-                        for (transactionInd in 1..summary.size) {
-                            val transaction = summary[transactionInd - 1]
-                            println(Colors().purpleColorText("${transactionInd}-> Title: ${transaction.title}, Amount: ${transaction.amount}, Type: ${
-                                transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }
-                            }, Category: ${
-                                transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }
-                            }, Date: ${transaction.date}"))
-                        }
-                        println(Colors().blueStars())
-                    }else
-                        println(Colors().redColorText("You have no any transactions in this month"))
+                    // run view monthly summary
+                    runViewMonthlySummary(summary)
                 }
-            }else println(Colors().redColorText("Invalid Year"))
+            }else println(Colors().changeColorTextToRed("Invalid Year"))
         }
-        else println(Colors().redColorText("Invalid month"))
+        else println(Colors().changeColorTextToRed("Invalid month"))
     }
 
     private fun viewBalanceReport() {
         val totalTransactions = manager.getBalanceReport()
         while (true) {
-            val transactions = viewTransactions(totalTransactions.transactions)
-            if (transactions.isEmpty()) {
+            viewTransactions(totalTransactions.transactions)
+            if (totalTransactions.transactions.isEmpty()) {
                 break
             }
             break
         }
-        println(Colors().greenColorText("Show Total Balance report "))
-        println(Colors().greenColorText("Balance report is: ${totalTransactions.totalBalance}\nIncome Balance report is: ${totalTransactions.incomeBalance}\nExpenses Balance report is: ${totalTransactions.expensesBalance}"))
+        println(Colors().changeColorTextToGreen("Show Total Balance report "))
+        println(Colors().changeColorTextToGreen("Balance report is: ${totalTransactions.totalBalance}\nIncome Balance report is: ${totalTransactions.incomeBalance}\nExpenses Balance report is: ${totalTransactions.expensesBalance}"))
         println(Colors().blueStars())
     }
 
     fun checkMonth(month:Int): Boolean{
         return month in 1..12
+    }
+
+    fun editTransactionTitle(currentTransaction: Transaction): Transaction{
+        // Title
+        print("Do you want to change the title? (Enter y if you want or anything else to skip): ")
+        check = readlnOrNull()?.trim()
+        // Simplified condition - only proceed if input is exactly "y" or "Y"
+        if (check.equals("y", ignoreCase = true)) {
+            print("\tEnter title: ")
+            val title = readlnOrNull()?.trim()?.takeIf { it.isNotEmpty() } ?: run {
+                println("\u001B[31mTitle cannot be empty. Keeping previous title.\u001B[0m")
+                currentTransaction.title
+            }
+            return currentTransaction.copy(
+                title = title,
+                date = Date()
+            )
+        }
+        else return currentTransaction
+    }
+
+    fun editTransactionAmount(currentTransaction: Transaction): Transaction{
+        print("Do you want to change the amount? (Enter y if you want or anything else to skip): ")
+        check = readlnOrNull()?.trim()
+
+        if (check.equals("y", ignoreCase = true)) {
+            print("\tEnter amount: ")
+            val amount = readlnOrNull()?.toDoubleOrNull() ?: run {
+                println("\u001B[31mInvalid amount. Keeping previous amount.\u001B[0m")
+                currentTransaction.amount
+            }
+            return currentTransaction.copy(
+                amount = amount,
+                date = Date()
+            )
+        }else return currentTransaction
+    }
+
+    fun editTransactionType(currentTransaction: Transaction): Transaction{
+        print("Do you want to change the type? (Enter y if you want " +
+                "or anything else to skip): ")
+        check = readlnOrNull()?.trim()
+
+        if (check.equals("y", ignoreCase = true)) {
+            val type = getValidTransactionType()
+            return currentTransaction.copy(
+                transactionType = type,
+                date = Date()
+            )
+        }else return currentTransaction
+    }
+
+    fun editTransactionCategory(currentTransaction: Transaction): Transaction{
+        print("Do you want to change the category? (Enter y if you want or " +
+                "anything else to skip): ")
+        check = readlnOrNull()?.trim()
+
+        if (check.equals("y", ignoreCase = true)) {
+            val category = getValidCategory()
+            return currentTransaction.copy(
+                category = category,
+                date = Date()
+            )
+        }else return currentTransaction
+    }
+
+    fun runViewMonthlySummary(summary: List<Transaction>){
+        if (summary.isNotEmpty()){
+            for (transactionInd in 1..summary.size) {
+                val transaction = summary[transactionInd - 1]
+                println(Colors().changeColorTextToPurple("${transactionInd}-> Title: ${transaction.title}, Amount: ${transaction.amount}, Type: ${
+                    transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }
+                }, Category: ${
+                    transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }
+                }, Date: ${transaction.date}"))
+            }
+            println(Colors().blueStars())
+        }else
+            println(Colors().changeColorTextToRed("You have no any transactions in this month"))
     }
 
 }
