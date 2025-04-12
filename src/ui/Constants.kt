@@ -69,19 +69,12 @@ enum class Constants(val message: String) {
     NO_TRANSACTIONS("You don't have any transactions."),
     MONTHLY_SUMMARY_NOT_FOUND("No transactions found for"),
 
-    // Prompt prefix
-    PROMPT_ARROW("- "),
-
-    // Options
-    OPTION_YES("y"),
-
-    AMOUTN("Amount"),
+    // Fields To Edit
+    AMOUNT("Amount"),
     TYPE("Type"),
     CATEGORY("Category"),
     DATE("Date"),
     TITLE("Title"),
     ;
-
-
 
 }

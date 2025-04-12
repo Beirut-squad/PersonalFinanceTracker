@@ -194,7 +194,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             val transaction = transactions[transactionInd - 1]
             Colors().printPurpleColorText(
                 "\t${transactionInd}: " +
-                        "${Constants.TITLE.message}: ${transaction.title}, ${Constants.AMOUTN.message}: ${transaction.amount}, ${Constants.TYPE.message}: ${
+                        "${Constants.TITLE.message}: ${transaction.title}, ${Constants.AMOUNT.message}: ${transaction.amount}, ${Constants.TYPE.message}: ${
                             transaction.transactionType.toString().lowercase().replaceFirstChar
                             { it.uppercase() }
                         }, ${Constants.CATEGORY.message}: ${
@@ -325,23 +325,13 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
         summary.forEachIndexed { index, transaction ->
             Colors().printPurpleColorText(
                 "${index + 1} -> ${Constants.TITLE.message}: ${transaction.title}, " +
-                        "${Constants.AMOUTN.message}: ${transaction.amount}, " +
+                        "${Constants.AMOUNT.message}: ${transaction.amount}, " +
                         "${Constants.TYPE.message}: ${transaction.transactionType.name
                             .lowercase().replaceFirstChar { it.uppercase() }}, " +
                         "${Constants.CATEGORY.message}: ${transaction.category.name.lowercase()
                             .replaceFirstChar { it.uppercase() }}, " +
                         "${Constants.DATE.message}: ${transaction.date}"
             )
-
-            /*Colors().printPurpleColorText(
-                "${index + 1} -> Title: ${transaction.title}, " +
-                        "Amount: ${transaction.amount}, " +
-                        "Type: ${transaction.transactionType.name
-                            .lowercase().replaceFirstChar { it.uppercase() }}, " +
-                        "Category: ${transaction.category.name.lowercase()
-                            .replaceFirstChar { it.uppercase() }}, " +
-                        "Date: ${transaction.date}"
-            )*/
         }
     }
 
