@@ -32,7 +32,7 @@ jobs:
         run: |
           
           # Find all Kotlin source files from all relevant source directories
-          KOTLIN_SOURCES=$(find src/core src/datasource src/test src/models src/manager -name "*.kt" | tr '\n' ' ')
+          KOTLIN_SOURCES=$(find src/core src/datasource src/test src/models -name "*.kt" | tr '\n' ' ')
           
           import core.*
           import datasource.*
