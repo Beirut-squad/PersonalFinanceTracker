@@ -101,15 +101,33 @@ jobs:
           }
           EOF
 
-          echo "Compiling Kotlin files..."
-          kotlinc $KOTLIN_SOURCES RunValidations.kt -include-runtime -d RunValidations.jar
+          # Compile and run tests
+          kotlinc RunValidations.kt -include-runtime -d RunValidations.jar
+          TEST_OUTPUT=$(kotlin -classpath RunValidations.jar ValidationRunnerKt 2>&1 || true)
+          
+          # Parse and format output
+          echo "TEST_RESULTS<<EOF" >> $GITHUB_OUTPUT
+          echo "$TEST_OUTPUT" | grep -E '::(notice|error)::' | sed 's/::.*:://' >> $GITHUB_OUTPUT
+          echo "EOF"
+          
+          # Set success status
+          if echo "$TEST_OUTPUT" | grep -q "::error::"; then
+            echo "HAS_FAILURES=true" >> $GITHUB_OUTPUT
+          else
+            echo "HAS_FAILURES=false" >> $GITHUB_OUTPUT
+          fi
 
-          echo "Running validations..."kotlin -classpath RunValidations.jar ValidationRunnerKt
-
-      - name: Create summary
+      - name: Create visible summary
         if: always()
         run: |
-          echo "### Validation Results" >> $GITHUB_STEP_SUMMARY
-          echo "${{ steps.run-validations.outputs.results }}" | sed 's/%0A/\n/g' >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "**Overall Status:** ${{ steps.run-validations.outputs.success == 'true' && '✅ All checks passed' || '❌ Some checks failed' }}" >> $GITHUB_STEP_SUMMARY
+          echo "### 🧪 Test Results" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          echo "${{ steps.run-tests.outputs.TEST_RESULTS }}" >> $GITHUB_STEP_SUMMARY
+          echo '```' >> $GITHUB_STEP_SUMMARY
+          
+          if ${{ steps.run-tests.outputs.HAS_FAILURES == 'true' }}; then
+            echo "❌ Some tests failed" >> $GITHUB_STEP_SUMMARY
+            exit 1
+          else
+            echo "✅ All tests passed" >> $GITHUB_STEP_SUMMARY
+          fi
