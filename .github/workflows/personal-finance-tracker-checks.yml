@@ -26,19 +26,25 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
+      - name: Install Kotlin Compiler
+        run: |
+          curl -s https://get.sdkman.io | bash
+          source "$HOME/.sdkman/bin/sdkman-init.sh"
+          sdk install kotlin
+
+      - name: Check Kotlin Version
+        run: kotlinc -version
+
       - name: Run validations
         id: run-validations
         run: |
           # Find all Kotlin source files
           KOTLIN_SOURCES=$(find src -name "*.kt" | tr '\n' ' ')
-          
-          # Create test runner file
+
+          # Create test runner file without package declaration
           cat << 'EOF' > RunValidations.kt
           @file:JvmName("ValidationRunner")
-          
-          package validation
-          
-          // Import all required classes
+
           import core.FinanceTrackerManager
           import core.FinanceTrackerManagerImpl
           import datasource.FinanceTrackerDataSource
@@ -52,7 +58,9 @@ jobs:
           import test.GetMonthlySummeryChecker
           import test.Checker
           import models.*
-          
+
+          import java.io.File
+
           fun main() {
               val dataSource: FinanceTrackerDataSource = InMemoryDataSource()
               val validator: FinanceTrackerValidator = FinanceTrackerValidatorImp()
@@ -60,25 +68,25 @@ jobs:
               val checker = Checker()
 
               val results = listOf<Pair<String, () -> Unit>>(
-                  Pair("Add Transaction") { 
+                  "Add Transaction" to {
                       AddTransactionChecker(financeTrackerManager, checker).runAddChecks()
                   },
-                  Pair("Delete Transaction") { 
+                  "Delete Transaction" to {
                       DeleteTransactionChecker(
                           FinanceTrackerManagerImpl(dataSource, validator),
                           checker
                       ).runDeleteChecks()
                   },
-                  Pair("Edit Transaction") { 
+                  "Edit Transaction" to {
                       EditTransactionChecker(
                           FinanceTrackerManagerImpl(dataSource, validator),
                           checker
                       ).runEditTransactionChecks()
                   },
-                  Pair("Balance Report") { 
+                  "Balance Report" to {
                       BalanceReportChecker(financeTrackerManager, checker).runBalanceReportChecks()
                   },
-                  Pair("Monthly Summary") { 
+                  "Monthly Summary" to {
                       GetMonthlySummeryChecker(financeTrackerManager, checker).runMonthlySummaryChecks()
                   }
               )
@@ -103,20 +111,21 @@ jobs:
                   }
               }
 
-              println("::set-output name=results::${output.joinToString("%0A")}")
-              println("::set-output name=success::$allSuccess")
-          
+              val githubOutput = System.getenv("GITHUB_OUTPUT")
+              File(githubOutput).appendText("results=${output.joinToString("%0A")}\n")
+              File(githubOutput).appendText("success=$allSuccess\n")
+
               if (!allSuccess) {
                   throw Exception("Some validations failed")
               }
           }
           EOF
-          
+
           # Compile all sources together
           echo "Compiling Kotlin files..."
           kotlinc $KOTLIN_SOURCES RunValidations.kt -include-runtime -d RunValidations.jar
-          kotlin -classpath RunValidations.jar validation.ValidationRunnerKt
-          
+
+          # Run the compiled test runner
           echo "Running validations..."
           java -jar RunValidations.jar
 
@@ -138,8 +147,9 @@ jobs:
                 status: "completed",
                 conclusion: process.env.SUCCESS === 'true' ? 'success' : 'failure',
                 output: {
-                  title: process.env.SUCCESS === 'true' ? 
-                    'All checks passed' : 'Some checks failed',
+                  title: process.env.SUCCESS === 'true'
+                    ? 'All checks passed'
+                    : 'Some checks failed',
                   summary: process.env.RESULTS.replace(/%0A/g, '\n'),
                   text: 'See workflow run for details'
                 }
