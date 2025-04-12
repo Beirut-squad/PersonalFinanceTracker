@@ -31,8 +31,8 @@ jobs:
         id: run-validations
         run: |
           
-          # Create temporary Kotlin file with test runner
-          cat << 'EOF' > RunValidations.kt
+          # Find all Kotlin source files from all relevant source directories
+          KOTLIN_SOURCES=$(find src/core src/datasource src/test src/models src/manager -name "*.kt" | tr '\n' ' ')
           
           import core.*
           import datasource.*
