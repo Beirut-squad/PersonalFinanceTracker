@@ -8,9 +8,9 @@ import java.util.*
 
 class EditTransactionChecker(
     private val financeTrackerManager: FinanceTrackerManager,
-    private val checker: Checker = Checker()
+    private val checker: Checker
 ) {
-    fun editTransactionCheck() {
+    fun runEditTransactionChecks() {
         // valid transaction edit : all fields are correct
         financeTrackerManager.clearTransactions()
         val successfulTransaction = Transaction(
