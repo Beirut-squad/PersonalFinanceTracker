@@ -134,21 +134,10 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                 in 1..transactions.size -> {
                     println("Edit your transaction")
                     var currentTransaction = transactions[(choice ?: 1) - 1]
-
-
-                    // edit title
                     currentTransaction = editTransactionTitle(currentTransaction)
-
-
-                    // edit amount
                     currentTransaction = editTransactionAmount(currentTransaction)
-
-                    // edit type
                     currentTransaction = editTransactionType(currentTransaction)
-
-                    // edit category
                     currentTransaction = editTransactionCategory(currentTransaction)
-
                     if (manager.editTransaction(currentTransaction)) {
                         Colors().printGreenColorText("Transaction edited")
                         Colors().blueStars()
@@ -158,7 +147,6 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                         Colors().blueStars()
                     }
                 }
-
                 else -> {
                     Colors().printRedColorText(
                         "Invalid input. Please enter a number between 1 and " +
@@ -170,11 +158,12 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
     }
 
     private fun deleteTransaction() {
+        val transactions = manager.getTransactions()
+        if (transactions.isEmpty()) {
+            Colors().printRedColorText("No transactions available to delete.")
+            return
+        }
         while (true) {
-            val transactions = manager.getTransactions()
-            if (transactions.isEmpty()) {
-                break
-            }
             viewTransactions(transactions)
             println("\tChoose the transaction you want to delete")
             print("- Choose an option (a number from 1 to ${transactions.size}): ")
@@ -188,8 +177,6 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                         break
                     }
                 }
-
-
                 else -> Colors().printRedColorText(
                     "Invalid input. Please enter a number " +
                             "between 1 and ${transactions.size}."
@@ -231,7 +218,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             val year = readlnOrNull()?.toIntOrNull() ?: 0
 
             if (checkYear(year)) {
-                viewTransactionsInMonthly(month, year)
+                viewTransactionsInMonth(month, year)
             } else {
                 Colors().printRedColorText("Invalid year, or empty input.")
             }
@@ -258,12 +245,12 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
         Colors().blueStars()
     }
 
-    fun checkMonth(month: Int): Boolean {
+    private fun checkMonth(month: Int): Boolean {
         return month in 1..12
     }
 
 
-    fun editTransactionTitle(currentTransaction: Transaction): Transaction{
+    private fun editTransactionTitle(currentTransaction: Transaction): Transaction{
         // Title
         print("Do you want to change the title? (Enter y if you want or anything else to skip): ")
         check = readlnOrNull()?.trim()
@@ -271,7 +258,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
         if (check.equals("y", ignoreCase = true)) {
             print("\tEnter title: ")
             val title = readlnOrNull()?.trim()?.takeIf { it.isNotEmpty() } ?: run {
-                println("\u001B[31mTitle cannot be empty. Keeping previous title.\u001B[0m")
+                Colors().printRedColorText("Title cannot be empty. Keeping previous title.")
                 currentTransaction.title
             }
             return currentTransaction.copy(
@@ -282,14 +269,14 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
         else return currentTransaction
     }
 
-    fun editTransactionAmount(currentTransaction: Transaction): Transaction{
+    private fun editTransactionAmount(currentTransaction: Transaction): Transaction{
         print("Do you want to change the amount? (Enter y if you want or anything else to skip): ")
         check = readlnOrNull()?.trim()
 
         if (check.equals("y", ignoreCase = true)) {
             print("\tEnter amount: ")
             val amount = readlnOrNull()?.toDoubleOrNull() ?: run {
-                println("\u001B[31mInvalid amount. Keeping previous amount.\u001B[0m")
+                Colors().printRedColorText("Invalid amount. Keeping previous amount.")
                 currentTransaction.amount
             }
             return currentTransaction.copy(
@@ -299,7 +286,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
         }else return currentTransaction
     }
 
-    fun editTransactionType(currentTransaction: Transaction): Transaction{
+    private fun editTransactionType(currentTransaction: Transaction): Transaction{
         print("Do you want to change the type? (Enter y if you want " +
                 "or anything else to skip): ")
         check = readlnOrNull()?.trim()
@@ -313,7 +300,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
         }else return currentTransaction
     }
 
-    fun editTransactionCategory(currentTransaction: Transaction): Transaction{
+    private fun editTransactionCategory(currentTransaction: Transaction): Transaction{
         print("Do you want to change the category? (Enter y if you want or " +
                 "anything else to skip): ")
         check = readlnOrNull()?.trim()
@@ -327,13 +314,12 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
         }else return currentTransaction
     }
 
- 
-    fun checkYear(year: Int): Boolean {
+    private fun checkYear(year: Int): Boolean {
         val currentYear = LocalDate.now().year
         return year in 1..currentYear
     }
 
-    private fun viewTransactionsInMonthly(month: Int, year: Int) {
+    private fun viewTransactionsInMonth(month: Int, year: Int) {
         val summary = manager.getMonthlySummery(month, year)
 
         if (summary.isEmpty()) {

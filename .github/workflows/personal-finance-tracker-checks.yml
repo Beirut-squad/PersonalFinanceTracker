@@ -2,8 +2,11 @@ name: Finance Tracker Validation
 
 on:
   pull_request:
-    branches: [ main ]
+    branches: [ develop ]  # Changed from main to develop
+  push:
+    branches: [ develop ]  # Optional: also run on direct pushes to develop
 
+# Required permissions to create check runs
 permissions:
   checks: write
   contents: read
@@ -27,11 +30,65 @@ jobs:
       - name: Run validations
         id: run-validations
         run: |
-          # ... (same Kotlin test runner code as before)
+          # Create temporary Kotlin file with test runner
+          cat << 'EOF' > RunValidations.kt
+          fun main() {
+              val dataSource: FinanceTrackerDataSource = InMemoryDataSource()
+              val validator: FinanceTrackerValidator = FinanceTrackerValidatorImp()
+              val financeTrackerManager: FinanceTrackerManager = FinanceTrackerManagerImpl(dataSource, validator)
+
+              val results = listOf(
+                  Pair("Add Transaction") { 
+                      AddTransactionChecker(financeTrackerManager).runAddTests() 
+                  },
+                  Pair("Delete Transaction") { 
+                      DeleteTransactionChecker(financeTrackerManager).runAllDeleteChecker() 
+                  },
+                  Pair("Edit Transaction") { 
+                      EditTransactionChecker(financeTrackerManager).editTransactionCheck() 
+                  },
+                  Pair("Balance Report") { 
+                      BalanceReportChecker(financeTrackerManager).checkBalanceReport() 
+                  },
+                  Pair("Monthly Summary") { 
+                      GetMonthlySummeryChecker(financeTrackerManager).runAllMonthlySummaryChecks() 
+                  }
+              )
+
+              val output = mutableListOf<String>()
+              var allSuccess = true
+
+              results.forEach { (name, test) ->
+                  try {
+                      println("::group::$name Checks")
+                      dataSource.clear()
+                      test()
+                      output.add("✓ $name - All tests passed")
+                      println("::endgroup::")
+                  } catch (e: Exception) {
+                      allSuccess = false
+                      output.add("✗ $name - ${e.message ?: "Test failed"}")
+                      println("::endgroup::")
+                      println("::error::${e.message}")
+                  }
+              }
+
+              println("::set-output name=results::${output.joinToString("%0A")}")
+              println("::set-output name=success::$allSuccess")
+          
+              if (!allSuccess) {
+                  throw Exception("Some validations failed")
+              }
+          }
+          EOF
+          
+          # Compile and run
+          kotlinc RunValidations.kt -include-runtime -d RunValidations.jar
+          java -jar RunValidations.jar
 
       - name: Create check run
-        uses: actions/github-script@v6
         if: always()
+        uses: actions/github-script@v6
         env:
           RESULTS: "${{ steps.run-validations.outputs.results }}"
           SUCCESS: "${{ steps.run-validations.outputs.success }}"
@@ -42,20 +99,22 @@ jobs:
               await github.rest.checks.create({
                 owner: context.repo.owner,
                 repo: context.repo.repo,
-                name: "Finance Tracker Validation",
+                name: "Finance Tracker Checks",
                 head_sha: context.sha,
                 status: "completed",
                 conclusion: process.env.SUCCESS === 'true' ? 'success' : 'failure',
                 output: {
-                  title: process.env.SUCCESS === 'true' ? 'All validations passed' : 'Some validations failed',
-                  summary: process.env.RESULTS
+                  title: process.env.SUCCESS === 'true' ? 
+                    'All checks passed' : 'Some checks failed',
+                  summary: process.env.RESULTS.replace(/%0A/g, '\n'),
+                  text: 'See workflow run for details'
                 }
-              });
+              })
             } catch (error) {
-              console.error('Error creating check run:', error);
-              // Fallback to regular status output
-              core.summary
+              core.error('Failed to create check run: ' + error.message)
+              // Fallback to job summary
+              await core.summary
                 .addHeading('Validation Results')
-                .addRaw(process.env.RESULTS)
-                .write();
+                .addRaw(process.env.RESULTS.replace(/%0A/g, '\n'))
+                .write()
             }
