@@ -29,7 +29,7 @@ jobs:
       - name: Run validations
         id: run-validations
         run: |
-          # Find all Kotlin source files from all relevant source directories
+          # Find all Kotlin source files
           KOTLIN_SOURCES=$(find src -name "*.kt" | tr '\n' ' ')
           
           # Create test runner file
@@ -50,28 +50,36 @@ jobs:
           import test.EditTransactionChecker
           import test.BalanceReportChecker
           import test.GetMonthlySummeryChecker
+          import test.Checker
           import models.*
           
           fun main() {
               val dataSource: FinanceTrackerDataSource = InMemoryDataSource()
               val validator: FinanceTrackerValidator = FinanceTrackerValidatorImp()
               val financeTrackerManager: FinanceTrackerManager = FinanceTrackerManagerImpl(dataSource, validator)
+              val checker = Checker()
 
               val results = listOf<Pair<String, () -> Unit>>(
                   Pair("Add Transaction") { 
-                      AddTransactionChecker(financeTrackerManager).runAddTests() 
+                      AddTransactionChecker(financeTrackerManager, checker).runAddChecks()
                   },
                   Pair("Delete Transaction") { 
-                      DeleteTransactionChecker(financeTrackerManager).runAllDeleteChecker() 
+                      DeleteTransactionChecker(
+                          FinanceTrackerManagerImpl(dataSource, validator),
+                          checker
+                      ).runDeleteChecks()
                   },
                   Pair("Edit Transaction") { 
-                      EditTransactionChecker(financeTrackerManager).editTransactionCheck() 
+                      EditTransactionChecker(
+                          FinanceTrackerManagerImpl(dataSource, validator),
+                          checker
+                      ).runEditTransactionChecks()
                   },
                   Pair("Balance Report") { 
-                      BalanceReportChecker(financeTrackerManager).checkBalanceReport() 
+                      BalanceReportChecker(financeTrackerManager, checker).runBalanceReportChecks()
                   },
                   Pair("Monthly Summary") { 
-                      GetMonthlySummeryChecker(financeTrackerManager).runAllMonthlySummaryChecks() 
+                      GetMonthlySummeryChecker(financeTrackerManager, checker).runMonthlySummaryChecks()
                   }
               )
 
@@ -84,10 +92,12 @@ jobs:
                       dataSource.clear()
                       test()
                       output.add("✓ $name - All tests passed")
+                      println("*************** End Test ***************")
                       println("::endgroup::")
                   } catch (e: Exception) {
                       allSuccess = false
                       output.add("✗ $name - ${e.message ?: "Test failed"}")
+                      println("*************** End Test ***************")
                       println("::endgroup::")
                       println("::error::${e.message}")
                   }
