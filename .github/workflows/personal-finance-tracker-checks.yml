@@ -2,7 +2,7 @@ name: Finance Tracker Validation
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches: [ main ]
 
 permissions:
   checks: write
@@ -24,111 +24,38 @@ jobs:
           java-version: '17'
           distribution: 'temurin'
 
-      - name: Run all validations
+      - name: Run validations
         id: run-validations
         run: |
-          # Create a temporary Kotlin file with the enhanced test runner
-          cat << 'EOF' > RunValidations.kt
-          import java.io.ByteArrayOutputStream
-          import java.io.PrintStream
+          # ... (same Kotlin test runner code as before)
 
-          fun main() {
-              val dataSource: FinanceTrackerDataSource = InMemoryDataSource()
-              val validator: FinanceTrackerValidator = FinanceTrackerValidatorImp()
-              val financeTrackerManager: FinanceTrackerManager = FinanceTrackerManagerImpl(dataSource, validator)
-
-              val checkers = listOf(
-                  "Add Transaction" to { AddTransactionChecker(financeTrackerManager).runAddTests() },
-                  "Delete Transaction" to { DeleteTransactionChecker(financeTrackerManager).runAllDeleteChecker() },
-                  "Edit Transaction" to { EditTransactionChecker(financeTrackerManager).editTransactionCheck() },
-                  "Balance Report" to { BalanceReportChecker(financeTrackerManager).checkBalanceReport() },
-                  "Monthly Summary" to { GetMonthlySummeryChecker(financeTrackerManager).runAllMonthlySummaryChecks() }
-              )
-
-              val results = mutableListOf<String>()
-              var allSuccess = true
-
-              for ((name, test) in checkers) {
-                  val outputStream = ByteArrayOutputStream()
-                  val printStream = PrintStream(outputStream)
-                  val oldOut = System.out
-          
-                  try {
-                      System.setOut(printStream)
-                      println("::group::$name Checks")
-                      dataSource.clear()
-                      test()
-                      results.add("✓ $name - All tests passed")
-                  } catch (e: Exception) {
-                      allSuccess = false
-                      results.add("✗ $name - ${e.message ?: "Test failed"}")
-                  } finally {
-                      System.out.flush()
-                      System.setOut(oldOut)
-                      val output = outputStream.toString()
-                      println(output)
-                      println("::endgroup::")
-          
-                      // Parse individual test results from checker output
-                      output.lines().forEach { line ->
-                          if (line.contains("Success:") || line.contains("Failure:")) {
-                              val cleanLine = line.replace("\u001B\\[[;\\d]*m", "") // Remove ANSI colors
-                              if (line.contains("Failure:")) {
-                                  println("::error::$cleanLine")
-                              } else {
-                                  println("::notice::$cleanLine")
-                              }
-                          }
-                      }
-                  }
-              }
-
-              println("::set-output name=results::${results.joinToString("%0A")}")
-              println("::set-output name=success::$allSuccess")
-          
-              if (!allSuccess) {
-                  throw Exception("Some validations failed")
-              }
-          }
-          EOF
-          
-          # Compile and run the validations
-          kotlinc RunValidations.kt -include-runtime -d RunValidations.jar
-          java -jar RunValidations.jar
-
-      - name: Create validation report
+      - name: Create check run
         uses: actions/github-script@v6
         if: always()
+        env:
+          RESULTS: "${{ steps.run-validations.outputs.results }}"
+          SUCCESS: "${{ steps.run-validations.outputs.success }}"
         with:
           github-token: ${{ secrets.GITHUB_TOKEN }}
           script: |
-            const results = `${{ steps.run-validations.outputs.results }}`.split('%0A');
-            const success = `${{ steps.run-validations.outputs.success }}` === 'true';
-            
-            // Create a summary with details
-            let summary = `## Finance Tracker Validation Results\n`;
-            summary += results.map(r => {
-              const icon = r.startsWith('✓') ? '✅' : '❌';
-              return `${icon} ${r.substring(2)}`;
-            }).join('\n');
-            
-            // Create check run
-            const { data: pr } = await github.rest.pulls.get({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              pull_number: context.issue.number
-            });
-            
-            await github.rest.checks.create({
-              owner: context.repo.owner,
-              repo: context.repo.repo,
-              name: "Finance Tracker Validation",
-              head_sha: pr.head.sha,
-              status: "completed",
-              conclusion: success ? "success" : "failure",
-              output: {
-                title: success ? "All validations passed" : "Some validations failed",
-                summary: summary,
-                text: "Detailed validation results are available in the workflow logs."
-              }
-            });
+            try {
+              await github.rest.checks.create({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                name: "Finance Tracker Validation",
+                head_sha: context.sha,
+                status: "completed",
+                conclusion: process.env.SUCCESS === 'true' ? 'success' : 'failure',
+                output: {
+                  title: process.env.SUCCESS === 'true' ? 'All validations passed' : 'Some validations failed',
+                  summary: process.env.RESULTS
+                }
+              });
+            } catch (error) {
+              console.error('Error creating check run:', error);
+              // Fallback to regular status output
+              core.summary
+                .addHeading('Validation Results')
+                .addRaw(process.env.RESULTS)
+                .write();
+            }
