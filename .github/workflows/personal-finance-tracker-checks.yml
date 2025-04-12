@@ -31,12 +31,14 @@ jobs:
         id: run-validations
         run: |
           
+          # Create temporary Kotlin file with test runner
+          cat << 'EOF' > RunValidations.kt
+          
           import core.*
           import datasource.*
           import test.*
+          import models.*
           
-          # Create temporary Kotlin file with test runner
-          cat << 'EOF' > RunValidations.kt
           fun main() {
               val dataSource: FinanceTrackerDataSource = InMemoryDataSource()
               val validator: FinanceTrackerValidator = FinanceTrackerValidatorImp()
