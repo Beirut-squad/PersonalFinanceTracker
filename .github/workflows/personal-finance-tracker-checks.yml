@@ -30,6 +30,11 @@ jobs:
       - name: Run validations
         id: run-validations
         run: |
+          
+          import core.*
+          import datasource.*
+          import test.*
+          
           # Create temporary Kotlin file with test runner
           cat << 'EOF' > RunValidations.kt
           fun main() {
