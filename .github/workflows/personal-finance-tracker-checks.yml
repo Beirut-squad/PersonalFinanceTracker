@@ -115,6 +115,7 @@ jobs:
           # Compile all sources together
           echo "Compiling Kotlin files..."
           kotlinc $KOTLIN_SOURCES RunValidations.kt -include-runtime -d RunValidations.jar
+          kotlin -classpath RunValidations.jar validation.ValidationRunnerKt
           
           echo "Running validations..."
           java -jar RunValidations.jar
