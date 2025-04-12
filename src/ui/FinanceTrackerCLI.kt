@@ -32,7 +32,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                 }
 
                 else -> {
-                    println(Colors().changeColorTextToRed("Invalid choice."))
+                    Colors().printRedColorText("Invalid choice.")
                 }
             }
         }
@@ -56,8 +56,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                 5 -> {
                     break
                 }
-
-                else -> println(Colors().changeColorTextToRed("Invalid choice."))
+                else -> Colors().printRedColorText("Invalid choice.")
             }
         }
     }
@@ -70,11 +69,8 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
 
             print("\tEnter amount: ")
             val amount = readlnOrNull()?.toDoubleOrNull() ?: 0.0
-
             val type = getValidTransactionType()
-
             val category = getValidCategory()
-
             val transaction = Transaction(
                 title = title,
                 amount = amount,
@@ -83,11 +79,11 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             )
 
             if (manager.addTransaction(transaction)) {
-                println(Colors().changeColorTextToGreen("Transactions Added"))
-                println(Colors().blueStars())
+                Colors().printGreenColorText("Transactions Added")
+                Colors().blueStars()
                 break
             } else {
-                println(Colors().changeColorTextToRed("please try again , there is an error in the data"))
+                Colors().printRedColorText("please try again , there is an error in the data")
             }
         }
 
@@ -100,7 +96,7 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             when (readlnOrNull()?.toIntOrNull()) {
                 1 -> return TransactionType.INCOME
                 2 -> return TransactionType.EXPENSE
-                else -> println(Colors().changeColorTextToRed("Invalid input. Please enter 1 or 2."))
+                else -> Colors().printRedColorText("Invalid input. Please enter 1 or 2.")
             }
         }
     }
@@ -110,12 +106,17 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             println("\tChoose category")
             for (categoryInd in 1..Category.entries.size) {
                 val category = Category.entries[categoryInd - 1]
-                println("\t\t${categoryInd}: ${category.toString().lowercase().replaceFirstChar { it.uppercase() }}")
+                Colors().printPurpleColorText(
+                    "\t\t${categoryInd}: " +
+                            category.toString().lowercase().replaceFirstChar { it.uppercase() })
             }
             print("- Choose an option (a number from 1 to ${Category.entries.size}): ")
             when (val choice = readlnOrNull()?.toIntOrNull()) {
                 in 1..Category.entries.size -> return Category.entries[(choice ?: 1) - 1]
-                else -> println(Colors().changeColorTextToRed("Invalid input. Please enter a number between 1 and ${Category.entries.size}."))
+                else -> Colors().printRedColorText(
+                    "Invalid input. Please enter a number between 1 and " +
+                            "${Category.entries.size}."
+                )
             }
         }
     }
@@ -134,8 +135,10 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     println("Edit your transaction")
                     var currentTransaction = transactions[(choice ?: 1) - 1]
 
+
                     // edit title
                     currentTransaction = editTransactionTitle(currentTransaction)
+
 
                     // edit amount
                     currentTransaction = editTransactionAmount(currentTransaction)
@@ -147,19 +150,20 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     currentTransaction = editTransactionCategory(currentTransaction)
 
                     if (manager.editTransaction(currentTransaction)) {
-                        println(Colors().changeColorTextToGreen("Transaction edited"))
-                        println(Colors().blueStars())
+                        Colors().printGreenColorText("Transaction edited")
+                        Colors().blueStars()
                         break
                     } else {
-                        println(Colors().changeColorTextToRed("please try again , there is " +
-                                "an error in the data"))
-                        println(Colors().blueStars())
+                        Colors().printRedColorText("please try again , there is an error in the data")
+                        Colors().blueStars()
                     }
                 }
 
                 else -> {
-                    println(Colors().changeColorTextToRed("Invalid input. Please enter a number " +
-                            "between 1 and ${transactions.size}."))
+                    Colors().printRedColorText(
+                        "Invalid input. Please enter a number between 1 and " +
+                                "${transactions.size}."
+                    )
                 }
             }
         }
@@ -179,13 +183,17 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
                     println("Delete your transaction")
                     val currentTransactionID = transactions[(choice ?: 1) - 1].id
                     if (manager.deleteTransaction(currentTransactionID)) {
-                        println(Colors().changeColorTextToGreen("Transaction deleted"))
-                        println(Colors().blueStars())
+                        Colors().printGreenColorText("Transaction deleted")
+                        Colors().blueStars()
                         break
                     }
                 }
 
-                else -> println(Colors().changeColorTextToRed("Invalid input. Please enter a number between 1 and ${transactions.size}."))
+
+                else -> Colors().printRedColorText(
+                    "Invalid input. Please enter a number " +
+                            "between 1 and ${transactions.size}."
+                )
             }
         }
     }
@@ -195,42 +203,38 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
     ) {
 
         if (transactions.isEmpty()) {
-            println(Colors().changeColorTextToRed("You don't have any transactions."))
+            Colors().printRedColorText("You don't have any transactions.")
+            return emptyList()
         }
 
         for (transactionInd in 1..transactions.size) {
             val transaction = transactions[transactionInd - 1]
-
-            println(
-                Colors().changeColorTextToPurple("\t${transactionInd}: title: ${transaction.title}" +
-                        ", amount: ${transaction.amount}, type: ${
-                    transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }
-                }, category: ${
-                    transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }
-                }, date: ${transaction.date}"
-            ))
+            Colors().printPurpleColorText(
+                "\t${transactionInd}: " +
+                        " title: ${transaction.title}, amount: ${transaction.amount}, type: ${
+                            transaction.transactionType.toString().lowercase().replaceFirstChar
+                            { it.uppercase() }
+                        }, category: ${
+                            transaction.category.toString()
+                                .lowercase().replaceFirstChar { it.uppercase() }
+                        }," +
+                        " date: ${transaction.date}"
+            )
         }
     }
 
     private fun viewMonthlySummary() {
-        println("Enter the Month that you want to view summary: 1-12")
-        val month = readlnOrNull().toString().toIntOrNull() ?: 0
+        print("Enter month (1-12): ")
+        val month = readlnOrNull()?.toIntOrNull()
 
-        if (month != 0 && checkMonth(month)){
-            println("Enter the Year that you want to view summary:")
-            val year = readlnOrNull().toString().toIntOrNull() ?: 0
+        print("Enter year: ")
+        val year = readlnOrNull()?.toIntOrNull()
 
-            if (year != 0 && year.toString().length == 4){
-                val summary = manager.getMonthlySummery(month,year)
-                if (month > (LocalDate.now().month.value) || year > LocalDate.now().year){
-                    println("The month or year will come later.")
-                }else{
-                    // run view monthly summary
-                    runViewMonthlySummary(summary)
-                }
-            }else println(Colors().changeColorTextToRed("Invalid Year"))
+        if (month != null && year != null && checkMonth(month) && checkYear(year)) {
+            viewTransactionsInMonthly(month, year)
+        } else {
+            Colors().printRedColorText("Invalid month or year, or empty input.")
         }
-        else println(Colors().changeColorTextToRed("Invalid month"))
     }
 
     private fun viewBalanceReport() {
@@ -242,14 +246,20 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
             }
             break
         }
-        println(Colors().changeColorTextToGreen("Show Total Balance report "))
-        println(Colors().changeColorTextToGreen("Balance report is: ${totalTransactions.totalBalance}\nIncome Balance report is: ${totalTransactions.incomeBalance}\nExpenses Balance report is: ${totalTransactions.expensesBalance}"))
-        println(Colors().blueStars())
+        Colors().printGreenColorText("Show Total Balance report ")
+        Colors().printGreenColorText(
+            "Balance report is: " +
+                    "${totalTransactions.totalBalance}\nIncome Balance report is: " +
+                    "${totalTransactions.incomeBalance}\nExpenses Balance report is: " +
+                    "${totalTransactions.expensesBalance}"
+        )
+        Colors().blueStars()
     }
 
-    fun checkMonth(month:Int): Boolean{
+    fun checkMonth(month: Int): Boolean {
         return month in 1..12
     }
+
 
     fun editTransactionTitle(currentTransaction: Transaction): Transaction{
         // Title
@@ -315,19 +325,31 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
         }else return currentTransaction
     }
 
-    fun runViewMonthlySummary(summary: List<Transaction>){
-        if (summary.isNotEmpty()){
-            for (transactionInd in 1..summary.size) {
-                val transaction = summary[transactionInd - 1]
-                println(Colors().changeColorTextToPurple("${transactionInd}-> Title: ${transaction.title}, Amount: ${transaction.amount}, Type: ${
-                    transaction.transactionType.toString().lowercase().replaceFirstChar { it.uppercase() }
-                }, Category: ${
-                    transaction.category.toString().lowercase().replaceFirstChar { it.uppercase() }
-                }, Date: ${transaction.date}"))
-            }
-            println(Colors().blueStars())
-        }else
-            println(Colors().changeColorTextToRed("You have no any transactions in this month"))
+ 
+    fun checkYear(year: Int): Boolean {
+        val currentYear = LocalDate.now().year
+        return year in 1..currentYear
+    }
+
+    private fun viewTransactionsInMonthly(month: Int, year: Int) {
+        val summary = manager.getMonthlySummery(month, year)
+
+        if (summary.isEmpty()) {
+            Colors().printRedColorText("No transactions found for $month/$year.")
+            return
+        }
+
+        summary.forEachIndexed { index, transaction ->
+            Colors().printPurpleColorText(
+                "${index + 1} -> Title: ${transaction.title}, " +
+                        "Amount: ${transaction.amount}, " +
+                        "Type: ${transaction.transactionType.name
+                            .lowercase().replaceFirstChar { it.uppercase() }}, " +
+                        "Category: ${transaction.category.name.lowercase()
+                            .replaceFirstChar { it.uppercase() }}, " +
+                        "Date: ${transaction.date}"
+            )
+        }
     }
 
 }
