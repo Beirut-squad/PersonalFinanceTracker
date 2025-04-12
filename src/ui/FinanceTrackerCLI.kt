@@ -204,7 +204,6 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
 
         if (transactions.isEmpty()) {
             Colors().printRedColorText("You don't have any transactions.")
-            return emptyList()
         }
 
         for (transactionInd in 1..transactions.size) {
@@ -225,16 +224,19 @@ class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
 
     private fun viewMonthlySummary() {
         print("Enter month (1-12): ")
-        val month = readlnOrNull()?.toIntOrNull()
+        val month = readlnOrNull()?.toIntOrNull() ?: 0
 
-        print("Enter year: ")
-        val year = readlnOrNull()?.toIntOrNull()
+        if (checkMonth(month)){
+            print("Enter year: ")
+            val year = readlnOrNull()?.toIntOrNull() ?: 0
 
-        if (month != null && year != null && checkMonth(month) && checkYear(year)) {
-            viewTransactionsInMonthly(month, year)
-        } else {
-            Colors().printRedColorText("Invalid month or year, or empty input.")
-        }
+            if (checkYear(year)) {
+                viewTransactionsInMonthly(month, year)
+            } else {
+                Colors().printRedColorText("Invalid year, or empty input.")
+            }
+        }else
+            Colors().printRedColorText("Invalid month, or empty input.")
     }
 
     private fun viewBalanceReport() {
