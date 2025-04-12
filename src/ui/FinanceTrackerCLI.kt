@@ -11,7 +11,7 @@ import java.util.*
 
 class FinanceTrackerCLI(private val manager: FinanceTrackerManager) {
     private var running = true
-    var check:String? = null
+    private var check:String? = null
 
     fun run() {
         while (running) {
