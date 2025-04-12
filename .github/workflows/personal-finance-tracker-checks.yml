@@ -125,9 +125,8 @@ jobs:
           echo "Compiling Kotlin files..."
           kotlinc $KOTLIN_SOURCES RunValidations.kt -include-runtime -d RunValidations.jar
 
-          # ✅ Run the main function by calling the class directly
-          echo "Running validations..."
-          kotlin -classpath RunValidations.jar ValidationRunner
+          # ✅ Run the compiled main function directly
+          echo "Running validations..."kotlin -classpath RunValidations.jar ValidationRunnerKt
 
       - name: Create check run
         if: always()
