@@ -67,28 +67,12 @@ jobs:
               val financeTrackerManager: FinanceTrackerManager = FinanceTrackerManagerImpl(dataSource, validator)
               val checker = Checker()
 
-              val results = listOf<Pair<String, () -> Unit>>(
-                  "Add Transaction" to {
-                      AddTransactionChecker(financeTrackerManager, checker).runAddChecks()
-                  },
-                  "Delete Transaction" to {
-                      DeleteTransactionChecker(
-                          FinanceTrackerManagerImpl(dataSource, validator),
-                          checker
-                      ).runDeleteChecks()
-                  },
-                  "Edit Transaction" to {
-                      EditTransactionChecker(
-                          FinanceTrackerManagerImpl(dataSource, validator),
-                          checker
-                      ).runEditTransactionChecks()
-                  },
-                  "Balance Report" to {
-                      BalanceReportChecker(financeTrackerManager, checker).runBalanceReportChecks()
-                  },
-                  "Monthly Summary" to {
-                      GetMonthlySummeryChecker(financeTrackerManager, checker).runMonthlySummaryChecks()
-                  }
+              val results = listOf(
+                  "Add Transaction" to { AddTransactionChecker(financeTrackerManager, checker).runAddChecks() },
+                  "Delete Transaction" to { DeleteTransactionChecker(financeTrackerManager, checker).runDeleteChecks() },
+                  "Edit Transaction" to { EditTransactionChecker(financeTrackerManager, checker).runEditTransactionChecks() },
+                  "Balance Report" to { BalanceReportChecker(financeTrackerManager, checker).runBalanceReportChecks() },
+                  "Monthly Summary" to { GetMonthlySummeryChecker(financeTrackerManager, checker).runMonthlySummaryChecks() }
               )
 
               val output = mutableListOf<String>()
@@ -96,24 +80,18 @@ jobs:
 
               results.forEach { (name, test) ->
                   try {
-                      println("::group::$name Checks")
                       dataSource.clear()
                       test()
-                      output.add("✓ $name - All tests passed")
-                      println("*************** End Test ***************")
-                      println("::endgroup::")
+                      output.add("✓ $name")
                   } catch (e: Exception) {
                       allSuccess = false
                       output.add("✗ $name - ${e.message ?: "Test failed"}")
-                      println("*************** End Test ***************")
-                      println("::endgroup::")
-                      println("::error::${e.message}")
                   }
               }
 
-              val githubOutput = System.getenv("GITHUB_OUTPUT")
-              File(githubOutput).appendText("results=${output.joinToString("%0A")}\n")
-              File(githubOutput).appendText("success=$allSuccess\n")
+              println("RESULTS<<EOF")
+              println(output.joinToString("\n"))
+              println("EOF")
 
               if (!allSuccess) {
                   throw Exception("Some validations failed")
@@ -121,42 +99,16 @@ jobs:
           }
           EOF
 
-          # Compile all sources together
           echo "Compiling Kotlin files..."
           kotlinc $KOTLIN_SOURCES RunValidations.kt -include-runtime -d RunValidations.jar
 
-          # ✅ Run the compiled main function directly
           echo "Running validations..."kotlin -classpath RunValidations.jar ValidationRunnerKt
 
-      - name: Create check run
+      - name: Show results in PR
         if: always()
-        uses: actions/github-script@v6
+        run: |
+          echo "Validation results:"
+          echo "$RESULTS"
+          echo "success=${{ steps.run-validations.outputs.success }}"
         env:
-          RESULTS: "${{ steps.run-validations.outputs.results }}"
-          SUCCESS: "${{ steps.run-validations.outputs.success }}"
-        with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          script: |
-            try {
-              await github.rest.checks.create({
-                owner: context.repo.owner,
-                repo: context.repo.repo,
-                name: "Finance Tracker Checks",
-                head_sha: context.sha,
-                status: "completed",
-                conclusion: process.env.SUCCESS === 'true' ? 'success' : 'failure',
-                output: {
-                  title: process.env.SUCCESS === 'true'
-                    ? 'All checks passed'
-                    : 'Some checks failed',
-                  summary: process.env.RESULTS.replace(/%0A/g, '\n'),
-                  text: 'See workflow run for details'
-                }
-              })
-            } catch (error) {
-              core.error('Failed to create check run: ' + error.message)
-              await core.summary
-                .addHeading('Validation Results')
-                .addRaw(process.env.RESULTS.replace(/%0A/g, '\n'))
-                .write()
-            }
+          RESULTS: ${{ steps.run-validations.outputs.results }}
