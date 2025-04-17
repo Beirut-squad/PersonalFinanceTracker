@@ -8,7 +8,7 @@ import datasource.InTextFileDataSource
 import datasource.utils.CsvParser
 
 fun main() {
-    val dataSource = InTextFileDataSource()
+    val dataSource = CsvDataSource(CsvParser())
     val validator: FinanceTrackerValidator = FinanceTrackerValidatorImp()
     val manager = FinanceTrackerManagerImpl(dataSource,validator)
     val cli = FinanceTrackerCLI(manager)
